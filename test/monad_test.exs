@@ -11,7 +11,7 @@ defmodule MonadTest do
 
   test "Maybe monad right identity" do
     m = return 42
-    assert bind(m, &return(&1)) == m
+    assert bind(m, &return/1) == m
   end
 
   test "Maybe monad associativity" do
