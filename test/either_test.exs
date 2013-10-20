@@ -34,4 +34,12 @@ defmodule EitherTest do
               return x * x
             end) == {:left, 2}
   end
+
+  test "Monad.Either.either/3 with left value" do
+    assert either(&(&1 * 2), &(&1 * &1), left 4) == 8
+  end
+
+  test "Monad.Either.either/3 with right value" do
+    assert either(&(&1 * 2), &(&1 * &1), right 4) == 16
+  end
 end

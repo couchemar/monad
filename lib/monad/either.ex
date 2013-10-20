@@ -7,4 +7,7 @@ defmodule Monad.Either do
   def left(x), do: {:left, x}
 
   def right(x), do: {:right, x}
+
+  def either(f, _, {:left, x}), do: f.(x)
+  def either(_, g, {:right, y}), do: g.(y)
 end
