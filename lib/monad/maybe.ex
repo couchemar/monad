@@ -9,4 +9,8 @@ defmodule Monad.Maybe do
   def return(x) do
     {:just, x}
   end
+
+  def fail(_) do
+    :nothing
+  end
 end
