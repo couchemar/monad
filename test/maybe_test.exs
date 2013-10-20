@@ -36,4 +36,9 @@ defmodule MaybeTest do
               return (x * y)
             end) == :nothing
   end
+
+  test "Monad.Maybe.is_just/1" do
+    assert is_just(just :whatever)
+    refute is_just(nothing)
+  end
 end

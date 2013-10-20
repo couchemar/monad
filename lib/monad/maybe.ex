@@ -7,4 +7,9 @@ defmodule Monad.Maybe do
   def fail(_), do: :nothing
 
   def just(x), do: return(x)
+
+  def nothing, do: :nothing
+
+  def is_just({:just, _}), do: true
+  def is_just(_), do: false
 end
