@@ -11,7 +11,7 @@ defmodule MonadTest do
             end) == {:just, 8}
     end
 
-  test "Mayb monad bind fail" do
+  test "Maybe monad bind fail" do
     assert (m_do Monad.Maybe do
               x <- return 2
               y <- fail "Yes, we can"
