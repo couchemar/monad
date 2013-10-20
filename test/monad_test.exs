@@ -9,7 +9,7 @@ defmodule MonadTest do
               y <- return 4
               return (x * y)
             end) == {:just, 8}
-    end
+  end
 
   test "Maybe monad bind fail" do
     assert (m_do Monad.Maybe do
@@ -17,5 +17,5 @@ defmodule MonadTest do
               y <- fail "Yes, we can"
               return (x * y)
             end) == :nothing
-    end
+  end
 end
