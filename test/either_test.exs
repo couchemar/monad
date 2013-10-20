@@ -1,5 +1,5 @@
 defmodule EitherTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   import Monad
   import Monad.Either
 
