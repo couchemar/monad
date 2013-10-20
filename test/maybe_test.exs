@@ -41,4 +41,10 @@ defmodule MaybeTest do
     assert is_just(just :whatever)
     refute is_just(nothing)
   end
+
+  test "Monad.Maybe.is_nothing/1" do
+    assert is_nothing(nothing)
+    refute is_nothing(just :whatever)
+  end
+
 end

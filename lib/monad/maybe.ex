@@ -12,4 +12,7 @@ defmodule Monad.Maybe do
 
   def is_just({:just, _}), do: true
   def is_just(_), do: false
+
+  def is_nothing(:nothing), do: true
+  def is_nothing(_), do: false
 end
