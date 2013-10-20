@@ -5,4 +5,6 @@ defmodule Monad.Maybe do
   def return(x), do: {:just, x}
 
   def fail(_), do: :nothing
+
+  def just(x), do: return(x)
 end
