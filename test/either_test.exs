@@ -35,6 +35,13 @@ defmodule EitherTest do
             end) == {:left, 2}
   end
 
+  test "Monad.Either.fail" do
+    assert (m_do Monad.Either do
+              x <- fail "reason"
+              return x * x
+            end) == {:left, "reason"}
+  end
+
   test "Monad.Either.either/3 with left value" do
     assert either(&(&1 * 2), &(&1 * &1), left 4) == 8
   end

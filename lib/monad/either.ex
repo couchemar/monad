@@ -4,6 +4,8 @@ defmodule Monad.Either do
 
   def return(x), do: right(x)
 
+  def fail(r), do: left(r)
+
   def left(x), do: {:left, x}
 
   def right(x), do: {:right, x}
