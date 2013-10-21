@@ -18,4 +18,7 @@ defmodule Monad.Maybe do
 
   def is_nothing(:nothing), do: true
   def is_nothing(_), do: false
+
+  def from_just({:just, x}), do: x
+  def from_just(:nothing), do: raise "Monad.Maybe.from_just: nothing"
 end
