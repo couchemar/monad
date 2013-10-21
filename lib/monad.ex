@@ -1,9 +1,9 @@
 defmodule Monad do
-  def expand(_, [action]) do
+  defp expand(_, [action]) do
     action
   end
 
-  def expand(monad, [{:<-, _, [pattern, action]} | actions]) do
+  defp expand(monad, [{:<-, _, [pattern, action]} | actions]) do
     quote do
       f = fn unquote(pattern) ->
                unquote(expand(monad, actions))
@@ -11,7 +11,7 @@ defmodule Monad do
       unquote(monad).bind(unquote(action), f)
     end
   end
-  def expand(monad, [action | actions]) do
+  defp expand(monad, [action | actions]) do
     quote do
       f = fn (_) -> unquote(expand(monad, actions)) end
       unquote(monad).bind(unquote(action), f)
