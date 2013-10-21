@@ -12,16 +12,16 @@ the next.
 
 ## Mechanics
 
-The `m_do` macro provides do-syntax. Its expansion is quite
+The `m` macro provides do-syntax. Its expansion is quite
 straightforward, though recursive.
 
 ### Base Case
 
-A `m_do` block consisting of a single expression expands to just that
-expression. Consider the following example which involves the `Maybe`
-monad:
+A `m .. do` block consisting of a single expression expands to just
+that expression. Consider the following example which involves the
+`Maybe` monad:
 
-    m_do Monad.Maybe do
+    m Monad.Maybe do
       {:just, 42}
     end
 
@@ -30,7 +30,7 @@ Expands to:
     {:just, 42}
 
 Note that a `pattern <- action` expression does not make sense as the
-only (or last) expression in a `m_do` block.
+only (or last) expression in a `m ... do` block.
 
 ### Recursive Cases
 
@@ -39,7 +39,7 @@ recursively. There are two cases.
 
 The first case is the expansion of `pattern <- action` expressions:
 
-    m_do Monad.Maybe do
+    m Monad.Maybe do
       pattern <- action
       ...
     end
@@ -53,7 +53,7 @@ of the expressions.
 
 The second case is the expansion of all other kinds of expressions:
 
-    m_do Monad.Maybe do
+    m Monad.Maybe do
       action
       ...
     end
