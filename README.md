@@ -37,7 +37,7 @@ only (or last) expression in a `m_do` block.
 Blocks consisting of more than one expression are expanded
 recursively. There are two cases.
 
-The first case is the expansion of a `pattern <- action` expressions:
+The first case is the expansion of `pattern <- action` expressions:
 
     m_do Monad.Maybe do
       pattern <- action
