@@ -75,4 +75,12 @@ defmodule MaybeTest do
   test "Monad.Maybe.from_maybe/2 with nothing value" do
     assert from_maybe(:default, :nothing) == :default
   end
+
+  test "Monad.Maybe.maybe_to_list/1 with just value" do
+    assert maybe_to_list(just :value) == [:value]
+  end
+
+  test "Monad.Maybe.maybe_to_list/1 with nothing value" do
+    assert maybe_to_list(nothing) == []
+  end
 end
