@@ -10,12 +10,12 @@ defmodule Monad.Maybe do
 
   def nothing, do: :nothing
 
+  def maybe(_, f, {:just, x}), do: f.(x)
+  def maybe(y, f, :nothing), do: f.(y)
+
   def is_just({:just, _}), do: true
   def is_just(_), do: false
 
   def is_nothing(:nothing), do: true
   def is_nothing(_), do: false
-
-  def maybe(_, f, {:just, x}), do: f.(x)
-  def maybe(y, f, :nothing), do: f.(y)
 end
