@@ -22,7 +22,7 @@ defmodule MaybeTest do
   end
 
   test "Monad.Maybe successful bind" do
-    assert (m_do Monad.Maybe do
+    assert (m Monad.Maybe do
               x <- just 2
               y <- just 4
               return (x * y)
@@ -30,7 +30,7 @@ defmodule MaybeTest do
   end
 
   test "Monad.Maybe failing bind" do
-    assert (m_do Monad.Maybe do
+    assert (m Monad.Maybe do
               x <- just 2
               y <- fail "Yes, we can"
               return (x * y)

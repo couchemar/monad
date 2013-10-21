@@ -1,5 +1,5 @@
 defmodule Monad do
-  defmacro m_do(mod_name, do: block) do
+  defmacro m(mod_name, do: block) do
     monad = Macro.expand(mod_name, __CALLER__)
     case block do
       {:__block__, _, actions} ->

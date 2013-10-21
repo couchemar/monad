@@ -22,21 +22,21 @@ defmodule EitherTest do
   end
 
   test "Monad.Either successful bind" do
-    assert (m_do Monad.Either do
+    assert (m Monad.Either do
               x <- right 2
               return x * x
             end) == {:right, 4}
   end
 
   test "Monad.Either failing bind" do
-    assert (m_do Monad.Either do
+    assert (m Monad.Either do
               x <- left 2
               return x * x
             end) == {:left, 2}
   end
 
   test "Monad.Either.fail" do
-    assert (m_do Monad.Either do
+    assert (m Monad.Either do
               x <- fail "reason"
               return x * x
             end) == {:left, "reason"}
