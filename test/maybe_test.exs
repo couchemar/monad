@@ -91,4 +91,9 @@ defmodule MaybeTest do
   test "Monad.Maybe.list_to_maybe/1 with empty list" do
     assert list_to_maybe([]) == nothing
   end
+
+  test "Monad.Monad.cat_maybes/1" do
+    assert cat_maybes([nothing, just(1), nothing, just(2), just(3)]) ==
+      [1, 2, 3]
+  end
 end

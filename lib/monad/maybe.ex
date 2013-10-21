@@ -30,4 +30,8 @@ defmodule Monad.Maybe do
 
   def list_to_maybe([x | _]), do: just x
   def list_to_maybe([]), do: nothing
+
+  def cat_maybes(l) do
+    lc x inlist l, is_just(x), do: from_just x
+  end
 end
