@@ -15,4 +15,7 @@ defmodule Monad.Maybe do
 
   def is_nothing(:nothing), do: true
   def is_nothing(_), do: false
+
+  def maybe(_, f, {:just, x}), do: f.(x)
+  def maybe(y, f, :nothing), do: f.(y)
 end

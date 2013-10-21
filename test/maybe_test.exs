@@ -53,4 +53,11 @@ defmodule MaybeTest do
     refute is_nothing(just :whatever)
   end
 
+  test "Monad.Maybe.maybe/3 with just value" do
+    assert maybe(1, &(&1 + &1), just 2) == 4
+  end
+
+  test "Monad.Maybe.maybe/3 with nothing value" do
+    assert maybe(1, &(&1 + &1), nothing) == 2
+  end
 end
