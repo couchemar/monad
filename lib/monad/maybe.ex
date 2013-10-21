@@ -27,4 +27,7 @@ defmodule Monad.Maybe do
 
   def maybe_to_list({:just, x}), do: [x]
   def maybe_to_list(:nothing), do: []
+
+  def list_to_maybe([x | _]), do: just x
+  def list_to_maybe([]), do: nothing
 end
