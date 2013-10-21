@@ -96,4 +96,14 @@ defmodule MaybeTest do
     assert cat_maybes([nothing, just(1), nothing, just(2), just(3)]) ==
       [1, 2, 3]
   end
+
+  test "Monad.Maybe.map_maybes/1" do
+    f = fn (x) ->
+             case rem x, 2  do
+               0 -> just x
+               1 -> nothing
+             end
+        end
+    assert map_maybes(f, [1, 2, 3, 4, 5]) == [2, 4]
+  end
 end

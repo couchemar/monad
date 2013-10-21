@@ -34,4 +34,8 @@ defmodule Monad.Maybe do
   def cat_maybes(l) do
     lc x inlist l, is_just(x), do: from_just x
   end
+
+  def map_maybes(f, l) do
+    lc x inlist l, is_just(f.(x)), do: from_just f.(x)
+  end
 end
