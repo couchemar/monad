@@ -29,23 +29,13 @@ Expands to:
 
     {:just, 42}
 
-The only transformation done is that of `return` expressions, thus:
-
-    m_do Monad.Maybe do
-      return 42
-    end
-
-Expands to:
-
-    Monad.Maybe.return(42)
-
 Note that a `pattern <- action` expression does not make sense as the
 only (or last) expression in a `m_do` block.
 
 ### Recursive Cases
 
 Blocks consisting of more than one expression are expanded
-recursively. There are three cases.
+recursively. There are two cases.
 
 The first case is the expansion of a `pattern <- action` expressions:
 
@@ -61,21 +51,7 @@ Expands to:
 Where the body of the anonymous function is the expansion of the rest
 of the expressions.
 
-The second case is the expansion of `return` expressions:
-
-    m_do Monad.Maybe do
-      return 42
-      ...
-    end
-
-Expands to:
-
-    Monad.Maybe.bind(Monad.Maybe.return(42), fn (_) -> ... end)
-
-Where the body of the anonymous function again is the expansion of the
-rest of the expressions.
-
-The third case is the expansion of all other kinds of expressions:
+The second case is the expansion of all other kinds of expressions:
 
     m_do Monad.Maybe do
       action
