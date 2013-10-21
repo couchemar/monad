@@ -21,4 +21,7 @@ defmodule Monad.Maybe do
 
   def from_just({:just, x}), do: x
   def from_just(:nothing), do: raise "Monad.Maybe.from_just: nothing"
+
+  def from_maybe(_, {:just, x}), do: x
+  def from_maybe(d, :nothing), do: d
 end

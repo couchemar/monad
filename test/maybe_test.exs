@@ -67,4 +67,12 @@ defmodule MaybeTest do
   test "Monad.Maybe.from_just/1 with nothing value" do
     assert_raise RuntimeError, fn () -> from_just(nothing) end
   end
+
+  test "Monad.Maybe.from_maybe/2 with just value" do
+    assert from_maybe(:default, just :value) == :value
+  end
+
+  test "Monad.Maybe.from_maybe/2 with nothing value" do
+    assert from_maybe(:default, :nothing) == :default
+  end
 end
