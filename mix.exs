@@ -3,7 +3,7 @@ defmodule Monad.Mixfile do
 
   def project do
     [ app: :monad,
-      version: "0.2.1",
+      version: "0.3",
       name: "monad",
       source_url: "https://github.com/rmies/monad",
       elixir: "~> 0.10.3",
