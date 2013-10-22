@@ -6,9 +6,31 @@ This library provides do-syntax and monads for
 
 ## Contributing Guidelines
 
-Just send in a pull request.
+To contribute:
 
-TODO: Elaborate on this.
+1. Fork the `monad` repository on [GitHub](https://github.com/rmies/monad).
+
+2. Clone your fork or add the remote if you already have a clone of
+   the repository.
+
+        git clone git@github.com:your_username/monad.git
+        # or
+        git remote add mine git@github.com:your_username/monad.git
+
+3. Create a feature branch for your change.
+
+        git flow feature start name-of-your-branch
+
+4. Make your change and commit. Use a clear and descriptive commit
+   message, see [this note](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
+
+5. Push to your fork of the repository and then send a pull-request
+   through GitHub.
+
+        git push mine some-topic-branch
+
+6. We will review your patch and merge it into the main repository or
+   send you feedback.
 
 ### Coding Style
 
