@@ -1,4 +1,4 @@
-defmodule MaybeTest do
+defmodule Monad.MaybeTest do
   use ExUnit.Case, async: true
   import Monad
   import Monad.Maybe

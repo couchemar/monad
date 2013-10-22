@@ -1,4 +1,4 @@
-defmodule EitherTest do
+defmodule Monad.EitherTest do
   use ExUnit.Case, async: true
 
   require Monad
