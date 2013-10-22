@@ -1,8 +1,7 @@
 defmodule Monad.EitherTest do
   use ExUnit.Case, async: true
 
-  require Monad
-  import Monad
+  use Monad
   import Monad.Either
   
   doctest Monad.Either

@@ -11,21 +11,19 @@ defmodule Monad.Either do
   is passed the value inside the tuple is given to the function passed to bind.
 
   ## Examples
-  
-      iex> require Monad
-      iex> import Monad, only: [m: 2]
-      iex> alias Monad.Either
+ 
+      iex> use Monad
       
-      iex> Monad.m Monad.Either do 
+      iex> alias Monad.Either
+      iex> m Either do 
       ...>   a <- { :right, 1 }
       ...>   b <- return 2
       ...>   return a + b
       ...> end
       { :right, 3 }
-      
-      iex> import Monad, only: [m: 2]
+ 
       iex> alias Monad.Either
-      iex> Monad.m Monad.Either do 
+      iex> m Either do 
       ...>   a <- { :left, "aborted" }
       ...>   b <- { :right, 1 }
       ...>   return a + b
