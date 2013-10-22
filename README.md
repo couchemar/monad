@@ -49,7 +49,7 @@ To contribute:
 * In documentation use the first line as a short summary, this will
   show up in the function/module/whatever overview in the
   documentation.
-* Line length: limit the numbers of characters per line to 78.
+* Line length: limit the numbers of characters per line to 80.
 * Avoid trailing whitespace.
 
 ### Branching Model
