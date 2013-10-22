@@ -19,6 +19,7 @@ To contribute:
 
 3. Create a feature branch for your change.
 
+        git checkout -b feature/name-of-your-branch
         git flow feature start name-of-your-branch
 
 4. Make your change and commit. Use a clear and descriptive commit
