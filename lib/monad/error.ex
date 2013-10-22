@@ -1,5 +1,5 @@
 defmodule Monad.Error do
-  use Monad.Behaviour 
+  use Monad.Behaviour
 
   @moduledoc """
   The Error monad.
@@ -11,19 +11,19 @@ defmodule Monad.Error do
   is passed the value inside the tuple is given to the function passed to bind.
 
   ## Examples
- 
+
       iex> use Monad
-      
+
       iex> alias Monad.Error
-      iex> m Error do 
+      iex> m Error do
       ...>   a <- { :ok, 1 }
       ...>   b <- return 2
       ...>   return a + b
       ...> end
       { :ok, 3 }
- 
+
       iex> alias Monad.Error
-      iex> m Error do 
+      iex> m Error do
       ...>   a <- { :error, "aborted" }
       ...>   b <- { :ok, 1 }
       ...>   return a + b

@@ -70,7 +70,7 @@ defmodule Monad do
 
   The `pl` macro supports monadic pipelines. For example:
 
-      pl Error, (File.read("/tmp/foo") 
+      pl Error, (File.read("/tmp/foo")
                  |> Code.string_to_quoted(file: "/tmp/foo")
                  |> Macro.safe_term)
 
@@ -80,7 +80,7 @@ defmodule Monad do
   For a slightly nicer look this is also supported:
 
       pl Error do
-        File.read("/tmp/foo") 
+        File.read("/tmp/foo")
         |> Code.string_to_quoted(file: "/tmp/foo")
         |> Macro.safe_term)
       end
@@ -130,7 +130,7 @@ defmodule Monad do
       import Monad, only: [m: 2, pl: 2]
     end
   end
-  
+
   @doc """
   Monad do-notation.
 
@@ -182,12 +182,12 @@ defmodule Monad do
                         end)
     end]
   end
-  
+
   defmacro pl(mod, pipeline) when is_list(pipeline) do
     mod = Macro.expand(mod, __CALLER__)
     case pipeline[:do] do
       nil                         ->
-        raise ArgumentError, message: 
+        raise ArgumentError, message:
           "Monad.pl called with a list but it's not a keyword list with " <>
           "a 'do' key (i.e. not a passed do block)"
       { __block__, _, [expr] }    -> pl_expand(mod, expr)
@@ -241,12 +241,12 @@ defmodule Monad do
   value.
   """
   @callback bind(monad, (any -> monad)) :: monad
-  
+
   @doc """
   Like bind/2 but works on ASTs and the second argument should be a function
   call where the first argument is missing.
   """
-  @callback pipebind(Macro.t, Macro.t) :: Macro.t 
+  @callback pipebind(Macro.t, Macro.t) :: Macro.t
 end
 
 defmodule Monad.Behaviour do
@@ -263,7 +263,7 @@ defmodule Monad.Behaviour do
         quote location: :keep do
           # I think there should be no conflict with the variable used in `fn`,
           # but just to be sure let's use an odd variable name.
-          bind(unquote(x), fn _monad_pipebind_arg -> 
+          bind(unquote(x), fn _monad_pipebind_arg ->
             unquote(Monad.push_first_arg(fc, quote do: _monad_pipebind_arg))
           end)
         end

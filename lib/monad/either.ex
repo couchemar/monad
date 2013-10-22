@@ -1,5 +1,5 @@
 defmodule Monad.Either do
-  use Monad.Behaviour 
+  use Monad.Behaviour
 
   @moduledoc """
   The Either monad.
@@ -11,19 +11,19 @@ defmodule Monad.Either do
   is passed the value inside the tuple is given to the function passed to bind.
 
   ## Examples
- 
+
       iex> use Monad
-      
+
       iex> alias Monad.Either
-      iex> m Either do 
+      iex> m Either do
       ...>   a <- { :right, 1 }
       ...>   b <- return 2
       ...>   return a + b
       ...> end
       { :right, 3 }
- 
+
       iex> alias Monad.Either
-      iex> m Either do 
+      iex> m Either do
       ...>   a <- { :left, "aborted" }
       ...>   b <- { :right, 1 }
       ...>   return a + b

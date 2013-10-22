@@ -1,6 +1,6 @@
 defmodule Monad.MaybeTest do
   use ExUnit.Case, async: true
-  
+
   use Monad
   import Monad.Maybe
 
@@ -48,12 +48,12 @@ defmodule Monad.MaybeTest do
               return (x * y)
             end) == :nothing
   end
-  
+
   test "Monad.Maybe pipeline" do
-    assert (pl Monad.Maybe, (just(2) |> (&{:just, &1+2}).())) 
+    assert (pl Monad.Maybe, (just(2) |> (&{:just, &1+2}).()))
            == {:just, 4}
   end
-  
+
   test "Monad.Maybe pipeline fail" do
     assert (pl Monad.Maybe, (nothing |> (&{:just, &1+2}).()))
            == :nothing

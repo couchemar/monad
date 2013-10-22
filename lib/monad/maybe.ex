@@ -1,5 +1,5 @@
 defmodule Monad.Maybe do
-  use Monad.Behaviour 
+  use Monad.Behaviour
 
   def bind({:just, x}, f), do: f.(x)
   def bind(:nothing, _), do: :nothing

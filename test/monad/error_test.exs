@@ -3,7 +3,7 @@ defmodule Monad.ErrorTest do
 
   use Monad
   import Monad.Error
-  
+
   doctest Monad.Error
 
   test "Monad.Error error identity" do
@@ -39,27 +39,27 @@ defmodule Monad.ErrorTest do
   end
 
   test "Monad.Error pipeline" do
-    assert (pl Monad.Error, ({:ok, 2} |> (&{:ok, &1+2}).())) 
+    assert (pl Monad.Error, ({:ok, 2} |> (&{:ok, &1+2}).()))
            == {:ok, 4}
   end
-  
+
   test "Monad.Error pipeline fail" do
     assert (pl Monad.Error, ({:error, 2} |> (&{:ok, &1+2}).()))
            == {:error, 2}
   end
-  
+
   defp error_invert(x), do: Monad.Error.return(-x)
 
   defp error_add_n(x, y), do: Monad.Error.return(x + y)
-  
+
   test "Monad.Error pipeline multiple and call without parens" do
     assert (pl Monad.Error,
                ({:ok, 2} |> error_invert |> error_add_n(3)))
            == {:ok, 1}
   end
-  
+
   test "Monad.Error pipeline with do" do
-    assert (pl Monad.Error do 
+    assert (pl Monad.Error do
               {:ok, 2} |> error_invert |> error_add_n(3)
             end) == {:ok, 1}
   end
