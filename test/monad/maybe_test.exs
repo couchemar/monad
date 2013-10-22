@@ -1,6 +1,7 @@
-defmodule MaybeTest do
+defmodule Monad.MaybeTest do
   use ExUnit.Case, async: true
-  import Monad
+  
+  use Monad
   import Monad.Maybe
 
   test "Monad.Maybe left identity" do
@@ -27,6 +28,17 @@ defmodule MaybeTest do
               y <- just 4
               return (x * y)
             end) == {:just, 8}
+  end
+
+  test "Monad.Maybe succesful bind using `let`" do
+    assert (m Monad.Maybe do
+              let x = 2
+              let do
+                y = 4
+                z = 8
+              end
+              return (x + y + z)
+            end) == {:just, 14}
   end
 
   test "Monad.Maybe failing bind" do
