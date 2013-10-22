@@ -1,5 +1,5 @@
 defmodule Monad.Either do
-  @behaviour Monad
+  use Monad.Behaviour 
 
   @moduledoc """
   The Either monad.

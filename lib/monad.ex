@@ -2,12 +2,12 @@ defmodule Monad do
   use Behaviour
 
   @moduledoc """
-  Behaviour that provides monadic do-notation.
+  Behaviour that provides monadic do-notation and pipe-notation.
 
   ## Usage
 
   To use do-notation you need a module that implements Monad's
-  callbacks, i.e. the module needs to have `return/1` and `bind/2`.
+  callbacks, i.e. the module needs to have `return/1`, `bind/2`.
   This allows you to write stuff like:
 
       def call_if_safe_div(f, x, y) do
@@ -65,18 +65,77 @@ defmodule Monad do
   * `M.bind(M.return(m), f)`    <=> `f.(m)` ("left identity")
   * `M.bind(m, &M.return/1)`    <=> `m`     ("right identity")
   * `M.bind(m, f) |> M.bind(g)` <=> `m |> M.bind(fn y -> M.bind(f.(y), g))` ("associativity")
+
+  ## Pipe support
+
+  The `pl` macro supports monadic pipelines. For example:
+
+      pl Error, (File.read("/tmp/foo") 
+                 |> Code.string_to_quoted(file: "/tmp/foo")
+                 |> Macro.safe_term)
+
+  If any of the terms returns `{:error, x}` that's the return value of the pipeline,
+  if `{:ok, x}` is returned the `x` is passed to the next item.
+
+  For a slightly nicer look this is also supported:
+
+      pl Error do
+        File.read("/tmp/foo") 
+        |> Code.string_to_quoted(file: "/tmp/foo")
+        |> Macro.safe_term)
+      end
+
+  Under the hood pipe binding works by calling the `pipebind` function in a
+  monad module. If you use `use Monad.Behaviour` one is automatically created
+  (you can still override it though).
+
+  The `pipebind` function receives the AST form of a value argument and a
+  function. It has to return some AST that essentially does what bind does but
+  with a function that's missing the first argument. See the example below.
+
+  Pipe-notation is less powerful than do-notation
+
+  ## Defining a monad
+
+  To define your own monad create a module and use `Monad.Behaviour`. This will
+  mark the module as containing a monad behaviour and create an overridable
+  default `pipebind` function (which calls `bind`). You'll need to define
+  `return` and `bind` yourself.
+
+  Here's an example that defines `return`, `bind` and `pipebind`:
+
+      defmodule Monad.List do
+        use Monad.Behaviour
+
+        def return(x), do: [x]
+        def bind(x, f), do: Enum.flat_map(x, f)
+        def pipebind(x, fc) do
+          quote Enum.flat_map(x,
+            &unquote(Monad.push_first_arg(fc, quote do: &1)))
+        end
+      end
+
+  `Monad.push_first_arg/2` is a function that given a function call AST and an
+  argument AST will return a new function call where the argument is the first
+  argument. It handles all the edge cases of function calls correctly and is
+  almost always helpful for `pipebind`.
   """
 
   @doc """
-  Make the `m` macro available in your module.
+  Make the `m` and `pl` macros available in your module.
   """
   defmacro __using__(_opts) do
     quote location: :keep do
       require Monad
-      import Monad, only: [m: 2]
+      import Monad, only: [m: 2, pl: 2]
     end
   end
+  
+  @doc """
+  Monad do-notation.
 
+  See the `Monad` module documentation.
+  """
   defmacro m(mod, do: block) do
     case block do
       nil ->
@@ -123,9 +182,93 @@ defmodule Monad do
                         end)
     end]
   end
+  
+  defmacro pl(mod, pipeline) when is_list(pipeline) do
+    mod = Macro.expand(mod, __CALLER__)
+    case pipeline[:do] do
+      nil                         ->
+        raise ArgumentError, message: 
+          "Monad.pl called with a list but it's not a keyword list with " <>
+          "a 'do' key (i.e. not a passed do block)"
+      { __block__, _, [expr] }    -> pl_expand(mod, expr)
+      expr                        -> pl_expand(mod, expr)
+    end
+  end
+  defmacro pl(mod, pipeline) do
+    pl_expand(Macro.expand(mod, __CALLER__), pipeline)
+  end
+
+  defp pl_expand(mod, {:|>, _, [left, {:|>, _, [middle, right]}]}) do
+    # Process in the right order.
+    pl_expand_bin(mod, pl_expand_bin(mod, left, middle), right)
+  end
+  defp pl_expand(mod, {:|>, _, [left, right]}) do
+    pl_expand_bin(mod, left, right)
+  end
+
+  defp pl_expand_bin(mod, x, fc) do
+    mod.pipebind(x, fc)
+  end
+
+  @doc """
+  Create a new function call from function call AST `fc` where `arg` is the
+  first argument.
+  """
+  def push_first_arg(fc, arg)
+  def push_first_arg({call, meta, atom}, arg) when is_atom(atom) do
+    # Can safely ignore the atom
+    {call, meta, [arg]}
+  end
+  def push_first_arg({call, meta, args}, arg) when is_list(args) do
+    # Can safely ignore the atom
+    {call, meta, [arg|args]}
+  end
+  def push_first_arg(ast, _) do
+    raise ArgumentError, message:
+      "Invalid call in push_first_arg (usually in a Monad.pl pipeline): " <>
+      Macro.to_string(ast)
+  end
 
   @type monad :: any
 
+  @doc """
+  Put a value in the monad.
+  """
   @callback return(any) :: monad
+
+  @doc """
+  Bind a value in the monad to the passed function which returns a new monadic
+  value.
+  """
   @callback bind(monad, (any -> monad)) :: monad
+  
+  @doc """
+  Like bind/2 but works on ASTs and the second argument should be a function
+  call where the first argument is missing.
+  """
+  @callback pipebind(Macro.t, Macro.t) :: Macro.t 
+end
+
+defmodule Monad.Behaviour do
+  @moduledoc """
+  Helper for defining a monad.
+
+  Just `use Monad.Behaviour` in your monad module and define `return/1` and
+  `bind/2` and you get `pipebind/2` for free.
+  """
+  defmacro __using__(_opts) do
+    quote do
+      @behaviour Monad
+      def pipebind(x, fc) do
+        quote location: :keep do
+          # I think there should be no conflict with the variable used in `fn`,
+          # but just to be sure let's use an odd variable name.
+          bind(unquote(x), fn _monad_pipebind_arg -> 
+            unquote(Monad.push_first_arg(fc, quote do: _monad_pipebind_arg))
+          end)
+        end
+      end
+      defoverridable [pipebind: 2]
+    end
+  end
 end
