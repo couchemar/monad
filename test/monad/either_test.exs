@@ -38,6 +38,32 @@ defmodule Monad.EitherTest do
             end) == {:left, 2}
   end
 
+  test "Monad.Either pipeline" do
+    assert (pl Monad.Either, ({:right, 2} |> (&{:right, &1+2}).())) 
+           == {:right, 4}
+  end
+  
+  test "Monad.Either pipeline fail" do
+    assert (pl Monad.Either, ({:left, 2} |> (&{:right, &1+2}).()))
+           == {:left, 2}
+  end
+  
+  defp either_invert(x), do: Monad.Either.return(-x)
+
+  defp either_add_n(x, y), do: Monad.Either.return(x + y)
+  
+  test "Monad.Either pipeline multiple and call without parens" do
+    assert (pl Monad.Either,
+               ({:right, 2} |> either_invert |> either_add_n(3)))
+           == {:right, 1}
+  end
+  
+  test "Monad.Either pipeline with do" do
+    assert (pl Monad.Either do 
+              {:right, 2} |> either_invert |> either_add_n(3)
+            end) == {:right, 1}
+  end
+
   test "Monad.Either.fail" do
     assert (m Monad.Either do
               x <- fail "reason"

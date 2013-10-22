@@ -48,6 +48,16 @@ defmodule Monad.MaybeTest do
               return (x * y)
             end) == :nothing
   end
+  
+  test "Monad.Maybe pipeline" do
+    assert (pl Monad.Maybe, (just(2) |> (&{:just, &1+2}).())) 
+           == {:just, 4}
+  end
+  
+  test "Monad.Maybe pipeline fail" do
+    assert (pl Monad.Maybe, (nothing |> (&{:just, &1+2}).()))
+           == :nothing
+  end
 
   test "Monad.Maybe.maybe/3 with just value" do
     assert maybe(1, &(&1 + &1), just 2) == 4
