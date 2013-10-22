@@ -6,9 +6,9 @@ defmodule Monad.Error do
 
   Allows shortcutting computations in typical Elixir/Erlang style.
 
-  Works on values of the form `{:error, reason}` | `{:ok, value}`.
-  If an error value is passed to bind it is immediately returned, if an ok value
-  is passed the value inside the tuple is given to the function passed to bind.
+  Works on values of the form `{:error, reason}` | `{:ok, value}`.  If an error
+  value is passed to bind it is immediately returned, if an ok value is passed
+  the value inside the tuple is given to the function passed to bind.
 
   ## Examples
 

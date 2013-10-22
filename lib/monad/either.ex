@@ -6,9 +6,9 @@ defmodule Monad.Either do
 
   Allows shortcutting computations.
 
-  Works on values of the form `{:left, reason}` | `{:right, value}`.
-  If a left value is passed to bind it is immediately returned, if a right value
-  is passed the value inside the tuple is given to the function passed to bind.
+  Works on values of the form `{:left, reason}` | `{:right, value}`.  If a left
+  value is passed to bind it is immediately returned, if a right value is passed
+  the value inside the tuple is given to the function passed to bind.
 
   ## Examples
 
