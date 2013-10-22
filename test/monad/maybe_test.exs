@@ -1,6 +1,7 @@
 defmodule Monad.MaybeTest do
   use ExUnit.Case, async: true
-  import Monad
+  
+  use Monad
   import Monad.Maybe
 
   test "Monad.Maybe left identity" do

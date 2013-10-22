@@ -1,6 +1,16 @@
 defmodule Monad do
   use Behaviour
 
+  @doc """
+  Make the `m` macro available in your module.
+  """
+  defmacro __using__(_opts) do
+    quote location: :keep do
+      require Monad
+      import Monad, only: [m: 2]
+    end
+  end
+
   defmacro m(mod, do: block) do
     case block do
       nil ->
