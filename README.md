@@ -4,13 +4,13 @@ This library provides do-syntax and monads for
 [Elixir](http://elixir-lang.org/). It is heavily inspired by
 [Haskell](http://haskell.org/).
 
-## Contributing guidelines
+## Contributing Guidelines
 
 Just send in a pull request.
 
 TODO: Elaborate on this.
 
-### Coding style
+### Coding Style
 
 * Golden rule: just follow the style of the rest of the code.
 * Avoid unneccesary whitespace in expressions with braces and brackets
