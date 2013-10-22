@@ -13,7 +13,6 @@ defmodule Monad.Error do
   ## Examples
 
       iex> use Monad
-
       iex> alias Monad.Error
       iex> m Error do
       ...>   a <- { :ok, 1 }

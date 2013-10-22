@@ -13,7 +13,6 @@ defmodule Monad.Either do
   ## Examples
 
       iex> use Monad
-
       iex> alias Monad.Either
       iex> m Either do
       ...>   a <- { :right, 1 }
