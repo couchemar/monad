@@ -14,14 +14,16 @@ defmodule Monad.Either do
  
       iex> use Monad
       
-      iex> m Monad.Either do 
+      iex> alias Monad.Either
+      iex> m Either do 
       ...>   a <- { :right, 1 }
       ...>   b <- return 2
       ...>   return a + b
       ...> end
       { :right, 3 }
-      
-      iex> m Monad.Either do 
+ 
+      iex> alias Monad.Either
+      iex> m Either do 
       ...>   a <- { :left, "aborted" }
       ...>   b <- { :right, 1 }
       ...>   return a + b
