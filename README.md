@@ -28,3 +28,9 @@ TODO: Elaborate on this.
   show up in the function/module/whatever overview in the
   documentation.
 * Line length: limit the numbers of characters per line to 78.
+
+### Branching Model
+
+Use [Vincent Driessen's branching model](http://nvie.com/posts/a-successful-git-branching-model/)
+(as supported by [git-flow](https://github.com/nvie/gitflow), of
+course you're free to do it by hand).
