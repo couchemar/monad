@@ -1,4 +1,6 @@
 defmodule Monad.Either do
+  @behaviour Monad
+
   def bind(l = {:left, _}, _), do: l
   def bind({:right, x}, f), do: f.(x)
 

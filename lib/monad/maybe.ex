@@ -1,4 +1,6 @@
 defmodule Monad.Maybe do
+  @behaviour Monad
+
   def bind({:just, x}, f), do: f.(x)
   def bind(:nothing, _), do: :nothing
 
