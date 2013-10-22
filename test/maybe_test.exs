@@ -29,6 +29,17 @@ defmodule MaybeTest do
             end) == {:just, 8}
   end
 
+  test "Monad.Maybe succesful bind using `let`" do
+    assert (m Monad.Maybe do
+              let x = 2
+              let do
+                y = 4
+                z = 8
+              end
+              return (x + y + z)
+            end) == {:just, 14}
+  end
+
   test "Monad.Maybe failing bind" do
     assert (m Monad.Maybe do
               x <- just 2
