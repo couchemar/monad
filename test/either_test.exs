@@ -1,7 +1,11 @@
 defmodule EitherTest do
   use ExUnit.Case, async: true
+
+  require Monad
   import Monad
   import Monad.Either
+  
+  doctest Monad.Either
 
   test "Monad.Either left identity" do
     f = fn (x) -> x * x end
@@ -43,10 +47,10 @@ defmodule EitherTest do
   end
 
   test "Monad.Either.either/3 with left value" do
-    assert either(&(&1 * 2), &(&1 * &1), left 4) == 8
+    assert either(left(4), &(&1 * 2), &(&1 * &1)) == 8
   end
 
   test "Monad.Either.either/3 with right value" do
-    assert either(&(&1 * 2), &(&1 * &1), right 4) == 16
+    assert either(right(4), &(&1 * 2), &(&1 * &1)) == 16
   end
 end
