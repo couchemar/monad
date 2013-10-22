@@ -2,46 +2,41 @@ defmodule Monad do
   use Behaviour
 
   @moduledoc """
-  Helpers for writing monadic do-notation macros.
+  Behaviour that provides monadic do-notation.
 
   ## Usage
 
-  To add monadic do notation macro to your code you first need to
-  define a module that implements Macro.Monad's callbacks. That is, it
-  needs to have a return/1 and a bind/2.
+  To use do-notation you need a module that implements Monad's
+  callbacks, i.e. the module needs to have `return/1` and `bind/2`.
+  This allows you to write stuff like:
 
-  Then simply define a macro in which you call monad_do_notation with
-  your implementation module and the do block passed to your macro,
-  for example:
+      def call_if_safe_div(f, x, y) do
+        use Monad
+        import Monad.Maybe
 
-      defmacro source(opts) do
-        Macro.Monad.monad_do_notation(Pipe, opts[:do])
-      end
-
-  That's it, now you can write stuff like (with appropriate
-  `source_list` and such):
-
-      source do
-        yield_list [1, 2, 3]
-        return 3
+        m Monad.Maybe do
+          result <- case y == 0 do
+                      true  -> fail "division by zero"
+                      false -> return x / y
+                    end
+          return f.(result)
+        end
       end
 
   ## Terminology
 
-  In this module the term "monad" is used fairly loosely to address
-  the whole concept of a monad. For an explanation what a monad is,
-  look elsewhere, the internet is full of good and not so good monad
-  tutorials.
-
-  The term "monadic value" as used here refers to something you can
-  pass to a bind/2 function as the first argument. Because monads can
-  be so different what is a monadic value for one monad doesn't need
-  to be for another.
+  The term "monad" is used here fairly loosely to refer to the whole
+  concept of monads. One way of looking at monads is as a kind of
+  "programmable semicolon". Monads define what happens between the
+  evaluation of the expressions. They control how and whether the
+  results from one expression are passed to the next. For a better
+  explanation of what monads are, look elsewhere, the internet is full
+  of good (and not so good) monad tutorials.
 
   ## Do-notation
 
-  The do-notation supported is pretty simple. Basically there are four rules to
-  remember:
+  The do-notation supported is pretty simple. Basically there are
+  three rules to remember:
 
   1. Every "statement" (i.e. thing on it's own line or separated by
      `;`) has to return a monadic value unless it's a "let statement".
@@ -55,54 +50,13 @@ defmodule Monad do
      precedence rules cause annoyances you can use `let` with a do
      block.
 
-  4. For your convenience the `return/1` function of the monad is
-     automatically imported inside the do-block.
-
-  ## Example
-
-  If you don't understand any of the above, don't worry, monads are
-  one of those things which are easier to use in practice than in
-  theory. Here's an example from the tests of a simple but often
-  useful monad, the list monad:
-
-      defmodule ListM do
-        @behaviour Macro.Monad
-        def return(x), do: [x]
-        def bind(m, f), do: Enum.flat_map(m, f)
-
-        defmacro monad(opts) do
-          Macro.Monad.monad_do_notation(MonadTest.ListM, opts[:do])
-        end
-      end
-
-      test "list monad" do
-        require ListM
-
-        prods = ListM.monad do
-          x <- Enum.to_list(2..3)
-          y <- Enum.to_list(2..3)
-          let f = &(&1 * &2)
-          return { x, y, f.(x, y) }
-        end
-
-        assert prods == [
-          { 2, 2, 4 },
-          { 2, 3, 6 },
-          { 3, 2, 6 },
-          { 3, 3, 9 }
-        ]
-      end
-
-  The list monad is pretty much like the list comprehensions (or more
-  exactly: list comprehensions are based on the concept of the list
-  monad).
-
   ## Monad laws
 
-  Return and bind need to obey a few rules (the "monad laws") to avoid
-  surprising the user. In the following equivalences M stands for your
-  monad module, a for an arbitrary value, m for a monadic value and f
-  and g for functions that given a value return a new monadic value.
+  `return/1` and `bind/2` need to obey a few rules (the so-called
+  "monad laws") to avoid surprising the user. In the following
+  equivalences `M` stands for your monad module, `a` for an arbitrary
+  value, `m` for a monadic value and `f` and `g` for functions that
+  given a value return a new monadic value.
 
   Equivalence means you can always substitute the left side for the
   right side and vice versa in an expression without changing the
