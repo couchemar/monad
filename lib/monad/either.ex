@@ -6,7 +6,7 @@ defmodule Monad.Either do
 
   Allows shortcutting computations.
 
-  Works on values of the form `{ :left, reason }` | `{ :right, value }`.
+  Works on values of the form `{:left, reason}` | `{:right, value}`.
   If a left value is passed to bind it is immediately returned, if a right value
   is passed the value inside the tuple is given to the function passed to bind.
 
@@ -15,19 +15,19 @@ defmodule Monad.Either do
       iex> use Monad
       iex> alias Monad.Either
       iex> m Either do
-      ...>   a <- { :right, 1 }
+      ...>   a <- {:right, 1}
       ...>   b <- return 2
       ...>   return a + b
       ...> end
-      { :right, 3 }
+      {:right, 3}
 
       iex> alias Monad.Either
       iex> m Either do
-      ...>   a <- { :left, "aborted" }
-      ...>   b <- { :right, 1 }
+      ...>   a <- {:left, "aborted"}
+      ...>   b <- {:right, 1}
       ...>   return a + b
       ...> end
-      { :left, "aborted" }
+      {:left, "aborted"}
   """
 
   ## Monad implementations
@@ -45,18 +45,18 @@ defmodule Monad.Either do
   def fail(r), do: left(r)
 
   @doc """
-  Wraps a value in a `{ :left, value }` tuple.
+  Wraps a value in a `{:left, value}` tuple.
   """
   def left(x), do: {:left, x}
 
   @doc """
-  Wraps a value in a `{ :right, value }` tuple.
+  Wraps a value in a `{:right, value}` tuple.
   """
   def right(x), do: {:right, x}
 
   @doc """
-  If `e` is a `{ :left, v }` tuple `on_left` with `v`.
-  If `e` is a `{ :right, v }` tuple `on_right` with `v`.
+  If `e` is a `{:left, v}` tuple `on_left` with `v`.
+  If `e` is a `{:right, v}` tuple `on_right` with `v`.
   """
   def either(e, on_left, on_right)
   def either({:left, x}, f, _), do: f.(x)
