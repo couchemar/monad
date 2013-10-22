@@ -17,7 +17,7 @@ defmodule Monad do
       case Keyword.fetch(hd(let_exprs), :do) do
         :error ->
           let_exprs ++ expand(mod, exprs)
-        { :ok, e } ->
+        {:ok, e} ->
           [e | expand(mod, exprs)]
       end
     else
