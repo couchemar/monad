@@ -50,6 +50,7 @@ To contribute:
   show up in the function/module/whatever overview in the
   documentation.
 * Line length: limit the numbers of characters per line to 78.
+* Avoid trailing whitespace.
 
 ### Branching Model
 
