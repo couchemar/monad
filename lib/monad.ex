@@ -2,31 +2,14 @@ defmodule Monad do
   use Behaviour
 
   defmacro m(mod, do: block) do
-    monad_do_notation(mod, block)
-    # monad = Macro.expand(mod_name, __CALLER__)
-    # case block do
-    #   {:__block__, _, actions} ->
-    #     expand(monad, actions)
-    #   action ->
-    #     action
-    # end
-  end
-
-  def monad_do_notation(mod, do_block)
-  def monad_do_notation(_, nil) do
-    raise ArgumentError, message: "no or empty do block"
-  end
-  def monad_do_notation(mod, {:__block__, meta, exprs}) do
-    process_exprs(mod, meta, exprs)
-  end
-  def monad_do_notation(mod, expr) do
-    process_exprs(mod, [], [expr])
-  end
-
-  defp process_exprs(mod, meta, exprs) do
-    x = {:__block__, meta, do_process_exprs(mod, exprs)}
-    IO.puts(x |> Macro.to_string)
-    x
+    case block do
+      nil ->
+        raise ArgumentError, message: "missing or empty do block"
+      {:__block__, meta, exprs} ->
+        {:__block__, meta, do_process_exprs(mod, exprs)}
+      expr ->
+        {:__block__, [], do_process_exprs(mod, [expr])}
+    end
   end
 
   defp do_process_exprs(mod, [{ :let, _, let_exprs } | exprs]) do
