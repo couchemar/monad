@@ -6,41 +6,41 @@ defmodule Monad do
       nil ->
         raise ArgumentError, message: "missing or empty do block"
       {:__block__, meta, exprs} ->
-        {:__block__, meta, do_process_exprs(mod, exprs)}
+        {:__block__, meta, expand(mod, exprs)}
       expr ->
-        {:__block__, [], do_process_exprs(mod, [expr])}
+        {:__block__, [], expand(mod, [expr])}
     end
   end
 
-  defp do_process_exprs(mod, [{ :let, _, let_exprs } | exprs]) do
+  defp expand(mod, [{ :let, _, let_exprs } | exprs]) do
     if length(let_exprs) == 1 and is_list(hd(let_exprs)) do
       case Keyword.fetch(hd(let_exprs), :do) do
-        :error     -> let_exprs ++ do_process_exprs(mod, exprs)
+        :error     -> let_exprs ++ expand(mod, exprs)
         { :ok, e } ->
-          [ e | do_process_exprs(mod, exprs) ]
+          [ e | expand(mod, exprs) ]
       end
     else
-      let_exprs ++ do_process_exprs(mod, exprs)
+      let_exprs ++ expand(mod, exprs)
     end
   end
-  defp do_process_exprs(mod, [{ :<-, _, [lhs, rhs] } | exprs]) do
+  defp expand(mod, [{ :<-, _, [lhs, rhs] } | exprs]) do
     # x <- m  ==>  bind(b, fn x -> ... end)
-    do_process_bind(mod, lhs, rhs, exprs)
+    expand_bind(mod, lhs, rhs, exprs)
   end
-  defp do_process_exprs(_, [ expr ]) do
+  defp expand(_, [ expr ]) do
     [expr]
   end
-  defp do_process_exprs(mod, [ expr | exprs ]) do
+  defp expand(mod, [ expr | exprs ]) do
     # m       ==>  bind(b, fn _ -> ... end)
-    do_process_bind(mod, quote(do: _), expr, exprs)
+    expand_bind(mod, quote(do: _), expr, exprs)
   end
-  defp do_process_exprs(_, []) do
+  defp expand(_, []) do
     []
   end
 
-  defp do_process_bind(mod, lhs, rhs, exprs) do
+  defp expand_bind(mod, lhs, rhs, exprs) do
     [quote do
-      unquote(mod).bind(unquote(rhs), fn unquote(lhs) -> unquote_splicing(do_process_exprs(mod, exprs)) end)
+      unquote(mod).bind(unquote(rhs), fn unquote(lhs) -> unquote_splicing(expand(mod, exprs)) end)
     end]
   end
 
