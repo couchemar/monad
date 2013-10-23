@@ -4,6 +4,8 @@ defmodule Monad.MaybeTest do
   use Monad
   import Monad.Maybe
 
+  doctest Monad.Maybe
+
   test "Monad.Maybe left identity" do
     f = fn (x) -> x * x end
     a = 2
