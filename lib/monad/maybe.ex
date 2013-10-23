@@ -1,6 +1,30 @@
 defmodule Monad.Maybe do
   use Monad.Behaviour
 
+  @moduledoc """
+  The Maybe monad.
+
+  ## Examples
+
+      iex> use Monad
+      iex> alias Monad.Maybe
+      iex> m Maybe do
+      ...>   x <- just 1
+      ...>   y <- just 2
+      ...>   return x + y
+      ...> end
+      just 3
+
+      iex> use Monad
+      iex> alias Monad.Maybe
+      iex> m Maybe do
+      ...>   x <- just 1
+      ...>   y <- nothing
+      ...>   return x + y
+      ...> end
+      nothing
+  """
+
   def bind({:just, x}, f), do: f.(x)
   def bind(:nothing, _), do: :nothing
 
