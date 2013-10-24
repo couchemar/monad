@@ -187,20 +187,9 @@ defmodule Monad do
     pl_expand(Macro.expand(mod, __CALLER__), pipeline)
   end
 
-  defp pl_expand(mod, {:|>, _, [left, {:|>, _, [middle, right]}]}) do
-    # Process in the right order.
-    pl_expand_bin(mod, pl_expand_bin(mod, left, middle), right)
-  end
-  defp pl_expand(mod, {:|>, _, [left, right]}) do
-    pl_expand_bin(mod, left, right)
-  end
-  defp pl_expand(_mod, expr) do
-    # Pipeline without a `|>` operator (i.e. not a pipeline).
-    expr
-  end
-
-  defp pl_expand_bin(mod, x, fc) do
-    mod.pipebind(x, fc)
+  defp pl_expand(mod, pipeline) do
+    # Enum.reduce is a left fold
+    Macro.unpipe(pipeline) |> Enum.reduce(&(mod.pipebind(&2, &1)))
   end
  
   @type monad :: any
