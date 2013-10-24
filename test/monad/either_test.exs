@@ -51,6 +51,10 @@ defmodule Monad.EitherTest do
   defp either_invert(x), do: Monad.Either.return(-x)
 
   defp either_add_n(x, y), do: Monad.Either.return(x + y)
+  
+  test "Monad.Either pipeline with no pipe sign" do
+    assert (pl Monad.Either, {:right, 2}) == {:right, 2}
+  end
 
   test "Monad.Either pipeline multiple and call without parens" do
     assert (pl Monad.Either,

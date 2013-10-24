@@ -201,6 +201,10 @@ defmodule Monad do
   defp pl_expand(mod, {:|>, _, [left, right]}) do
     pl_expand_bin(mod, left, right)
   end
+  defp pl_expand(mod, expr) do
+    # Pipeline without a `|>` operator (i.e. not a pipeline).
+    expr
+  end
 
   defp pl_expand_bin(mod, x, fc) do
     mod.pipebind(x, fc)
