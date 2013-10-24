@@ -89,8 +89,6 @@ defmodule Monad do
   function. It has to return some AST that essentially does what bind does but
   with a function that's missing the first argument. See the example below.
 
-  Pipe-notation is less powerful than do-notation
-
   ## Defining a monad
 
   To define your own monad create a module and use `Monad.Behaviour`. This will
@@ -107,14 +105,9 @@ defmodule Monad do
         def bind(x, f), do: Enum.flat_map(x, f)
         def pipebind(x, fc) do
           quote Enum.flat_map(x,
-            &unquote(Monad.push_first_arg(fc, quote do: &1)))
+            &unquote(Macro.pipe(quote do &1 end, fc)))
         end
       end
-
-  `Monad.push_first_arg/2` is a function that given a function call AST and an
-  argument AST will return a new function call where the argument is the first
-  argument. It handles all the edge cases of function calls correctly and is
-  almost always helpful for `pipebind`.
   """
 
   @doc """
@@ -201,7 +194,7 @@ defmodule Monad do
   defp pl_expand(mod, {:|>, _, [left, right]}) do
     pl_expand_bin(mod, left, right)
   end
-  defp pl_expand(mod, expr) do
+  defp pl_expand(_mod, expr) do
     # Pipeline without a `|>` operator (i.e. not a pipeline).
     expr
   end
@@ -209,26 +202,7 @@ defmodule Monad do
   defp pl_expand_bin(mod, x, fc) do
     mod.pipebind(x, fc)
   end
-
-  @doc """
-  Create a new function call from function call AST `fc` where `arg` is the
-  first argument.
-  """
-  def push_first_arg(fc, arg)
-  def push_first_arg({call, meta, atom}, arg) when is_atom(atom) do
-    # Can safely ignore the atom
-    {call, meta, [arg]}
-  end
-  def push_first_arg({call, meta, args}, arg) when is_list(args) do
-    # Can safely ignore the atom
-    {call, meta, [arg|args]}
-  end
-  def push_first_arg(ast, _) do
-    raise ArgumentError, message:
-      "Invalid call in push_first_arg (usually in a Monad.pl pipeline): " <>
-      Macro.to_string(ast)
-  end
-
+ 
   @type monad :: any
 
   @doc """
@@ -264,7 +238,7 @@ defmodule Monad.Behaviour do
           # I think there should be no conflict with the variable used in `fn`,
           # but just to be sure let's use an odd variable name.
           bind(unquote(x), fn _monad_pipebind_arg ->
-            unquote(Monad.push_first_arg(fc, quote do: _monad_pipebind_arg))
+            unquote(Macro.pipe(quote do _monad_pipebind_arg end, fc))
           end)
         end
       end
