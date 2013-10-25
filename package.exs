@@ -5,5 +5,5 @@ Expm.Package.new(name: "monad",
                  maintainers: [[name: "Peter Minten",
                                 email: "peter.minten@online.nl"],
                                [name: "Michel Rijnders",
-                                email: "g.a.c.rijnders@gmail.com"]],
+                                email: "michel@read-eval-print.org"]],
                  repositories: [[github: "rmies/monad", tag: "0.3"]])
