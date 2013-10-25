@@ -20,14 +20,14 @@ defmodule Monad.Reader do
   """
  
   # A reader is just a function that receives the "under the hood" value.
-  @opaque reader :: ((any) -> any)
+  @opaque m :: ((any) -> any)
 
   ## Monad implementations
 
-  @spec bind(reader, ((any) -> reader)) :: reader
+  @spec bind(m, ((any) -> m)) :: m
   def bind(r, f), do: fn x -> f.(r.(x)).(x) end
 
-  @spec return(any) :: reader
+  @spec return(any) :: m
   def return(x), do: fn _ -> x end 
 
   ## Other functions
@@ -35,18 +35,18 @@ defmodule Monad.Reader do
   @doc """
   Run the reader by supplying the given value to it.
   """
-  @spec run(any, reader) :: any
+  @spec run(any, m) :: any
   def run(x, r), do: r.(x)
 
   @doc """
   Ask for the reader's value.
   """
-  @spec ask() :: reader
+  @spec ask() :: m
   def ask(), do: fn x -> x end 
 
   @doc """
   Locally set a different value for the reader.
   """
-  @spec local(reader, ((any) -> any)) :: reader
+  @spec local(m, ((any) -> any)) :: m
   def local(r, f), do: fn x -> r.(f.(x)) end
 end
