@@ -53,19 +53,23 @@ defmodule Monad.Maybe do
   Alias for `nothing/1`
   """
   @spec fail(any) :: nothing
-  def fail(_), do: nothing
+  def fail(_), do: :nothing
 
   @doc """
   Returns `just x`.
   """
-  @spec just(any) :: just
-  def just(x), do: return(x)
+  defmacro just(x) do
+    quote do
+      {:just, unquote(x)}
+    end
+  end
 
   @doc """
   Returns `nothing`.
   """
-  @spec nothing() :: nothing
-  def nothing, do: :nothing
+  defmacro nothing do
+    quote do: :nothing
+  end
 
   @doc """
   Call function `f` with the value inside the maybe value `m` if `m` is `just`,
