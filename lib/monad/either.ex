@@ -73,11 +73,18 @@ defmodule Monad.Either do
   end
 
   @doc """
-  If `e` is a `{:left, v}` tuple `on_left` with `v`.
-  If `e` is a `{:right, v}` tuple `on_right` with `v`.
+  Returns `f(x)` if `m` is `left x` or `g(x)` if `m` is `right x`.
+
+  ## Example
+
+      iex> either(left(2), &(&1 - 1), &(&1 + 1))
+      1
+
+      iex> either(right(2), &(&1 - 1), &(&1 + 1))
+      3
   """
   @spec either(either, (any -> any), (any -> any)) :: any
-  def either(e, on_left, on_right)
+  def either(m, f, g)
   def either({:left, x}, f, _), do: f.(x)
   def either({:right, y}, _, g), do: g.(y)
 end
