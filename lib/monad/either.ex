@@ -44,7 +44,7 @@ defmodule Monad.Either do
   Injects `x` into an Either monad.
   """
   @spec return(any) :: either
-  def return(x), do: right(x)
+  def return(x), do: {:right, x}
 
   ## Auxiliary functions
 
@@ -52,17 +52,25 @@ defmodule Monad.Either do
   Signal failure.
   """
   @spec fail(any) :: either
-  def fail(reason), do: left(reason)
+  def fail(reason), do: {:left, reason}
 
   @doc """
-  Wraps a value in a `{:left, value}` tuple.
+  Returns `left x`.
   """
-  def left(x), do: {:left, x}
+  defmacro left(x) do
+    quote do
+      {:left, unquote(x)}
+    end
+  end
 
   @doc """
-  Wraps a value in a `{:right, value}` tuple.
+  Returns `right x`.
   """
-  def right(x), do: {:right, x}
+  defmacro right(x) do
+    quote do
+      {:right, unquote(x)}
+    end
+  end
 
   @doc """
   If `e` is a `{:left, v}` tuple `on_left` with `v`.
