@@ -6,7 +6,7 @@ defmodule Monad.Mixfile do
      version: "0.3",
      name: "monad",
      source_url: "https://github.com/rmies/monad",
-     elixir: "~> 0.10.3",
+     elixir: "~> 0.10.4-dev",
      deps: deps]
   end
 
