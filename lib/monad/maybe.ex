@@ -4,11 +4,12 @@ defmodule Monad.Maybe do
   @moduledoc """
   The Maybe monad.
 
-  Allows for computations that return an optional value.
+  The `Maybe` monad encapsulates an optional value. A `maybe` monad either
+  contains a value `x` (represented as "`just x`") or is empty (represented as
+  "`nothing`").
 
-  Works on values of the form `{:just, value}` and `:nothing`. If a nothing is
-  passed to bind it is returned immediately. If a just value is passed to bind
-  the value inside the tuple is given to the function passed to bind.
+  `Maybe` is a simple kind of error monad, where all errors are represented by
+  `nothing`.
 
   ## Examples
 
@@ -57,7 +58,7 @@ defmodule Monad.Maybe do
   ## Auxiliary functions
 
   @doc """
-  Alias for `nothing/1`
+  Signal failure.
   """
   @spec fail(any) :: nothing
   def fail(_), do: :nothing
@@ -95,15 +96,14 @@ defmodule Monad.Maybe do
   def is_just(:nothing), do: false
 
   @doc """
-  Returns true if given the nothing value and false if given a just value.
+  Returns true if given `nothing` value and false if given `just x`.
   """
   @spec is_nothing(maybe) :: boolean
   def is_nothing(:nothing), do: true
   def is_nothing({:just, _}), do: false
 
   @doc """
-  Extracts the value out of a `just` and raises an error if given the nothing
-  value.
+  Extracts the value out of a `just` or raises an error if given `nothing`.
   """
   @spec from_just(maybe) :: any
   def from_just(m)
@@ -111,7 +111,7 @@ defmodule Monad.Maybe do
   def from_just(:nothing), do: raise "Monad.Maybe.from_just: nothing"
 
   @doc """
-  Returns the value inside a just, or the given default when given nothing.
+  Extracts the value out a `just` or returns default `d` if given `nothing`.
   """
   @spec from_maybe(any, maybe) :: any
   def from_maybe(d, m)
@@ -121,8 +121,17 @@ defmodule Monad.Maybe do
   @doc """
   Converts maybe value `m` to a list.
 
-  Returns an empty list when given the nothing value, return a list of one
-  elemnt containg the value inside the just when given a just value.
+  Returns an empty list if given `nothing` or returns a list that contains the
+  value of a `just`.
+
+  ## Examples
+
+      iex> maybe_to_list nothing
+      []
+
+      iex> maybe_to_list just(42)
+      [42]
+
   """
   @spec maybe_to_list(maybe) :: [any]
   def maybe_to_list(m)
@@ -132,8 +141,17 @@ defmodule Monad.Maybe do
   @doc """
   Converts list `l` to a maybe value.
 
-  Returns `nothing` if given an empty list; returns `just x` when given the
+  Returns `nothing` if given the empty list; returns `just x` when given the
   nonempty list `l`, where `x` is the head of `l`.
+
+  ## Examples
+
+      iex> list_to_maybe []
+      nothing
+
+      iex> list_to_maybe [1, 2, 3]
+      just 1
+
   """
   @spec list_to_maybe([any]) :: maybe
   def list_to_maybe(l)
