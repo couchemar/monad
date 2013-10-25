@@ -28,6 +28,13 @@ defmodule Monad.Maybe do
       ...>   return x + y
       ...> end
       nothing
+
+  ## Internal Representation
+
+  Currently this module uses `{:just, x}` and `:nothing` to represent `just x`
+  and `nothing` respectively, but please do _not_ use these in your code,
+  e.g. on the left-hand side of a pattern match. Use the `just/1` and
+  `nothing/0` macros instead to prevent future breakage.
   """
 
   @opaque just :: {:just, any}
