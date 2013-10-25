@@ -15,19 +15,19 @@ defmodule Monad.Either do
       iex> use Monad
       iex> alias Monad.Either
       iex> m Either do
-      ...>   a <- {:right, 1}
+      ...>   a <- return 1
       ...>   b <- return 2
       ...>   return a + b
       ...> end
-      {:right, 3}
+      right 3
 
       iex> alias Monad.Either
       iex> m Either do
-      ...>   a <- {:left, "aborted"}
-      ...>   b <- {:right, 1}
+      ...>   a <- fail "aborted"
+      ...>   b <- return 1
       ...>   return a + b
       ...> end
-      {:left, "aborted"}
+      left "aborted"
   """
 
   @opaque left :: {:left, any}
@@ -55,7 +55,7 @@ defmodule Monad.Either do
   def fail(reason), do: {:left, reason}
 
   @doc """
-  Returns `left x`.
+  Turns `x` into a `left` value.
   """
   defmacro left(x) do
     quote do
@@ -64,7 +64,7 @@ defmodule Monad.Either do
   end
 
   @doc """
-  Returns `right x`.
+  Turns `x` into a `right` value.
   """
   defmacro right(x) do
     quote do
