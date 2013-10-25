@@ -15,49 +15,68 @@ defmodule Monad.Either do
       iex> use Monad
       iex> alias Monad.Either
       iex> m Either do
-      ...>   a <- {:right, 1}
+      ...>   a <- return 1
       ...>   b <- return 2
       ...>   return a + b
       ...> end
-      {:right, 3}
+      right 3
 
       iex> alias Monad.Either
       iex> m Either do
-      ...>   a <- {:left, "aborted"}
-      ...>   b <- {:right, 1}
+      ...>   a <- fail "aborted"
+      ...>   b <- return 1
       ...>   return a + b
       ...> end
-      {:left, "aborted"}
+      left "aborted"
   """
+
+  @opaque left :: {:left, any}
+  @opaque right :: {:right, any}
+  @type either :: left | right
 
   ## Monad implementations
 
+  @spec bind(either, (any -> any)) :: either
   def bind(l = {:left, _}, _), do: l
   def bind({:right, x}, f), do: f.(x)
 
-  def return(x), do: right(x)
+  @doc """
+  Injects `x` into an Either monad.
+  """
+  @spec return(any) :: either
+  def return(x), do: {:right, x}
 
   ## Auxiliary functions
 
   @doc """
-  Alias for `left/1`.
+  Signal failure.
   """
-  def fail(r), do: left(r)
+  @spec fail(any) :: either
+  def fail(reason), do: {:left, reason}
 
   @doc """
-  Wraps a value in a `{:left, value}` tuple.
+  Turns `x` into a `left` value.
   """
-  def left(x), do: {:left, x}
+  defmacro left(x) do
+    quote do
+      {:left, unquote(x)}
+    end
+  end
 
   @doc """
-  Wraps a value in a `{:right, value}` tuple.
+  Turns `x` into a `right` value.
   """
-  def right(x), do: {:right, x}
+  defmacro right(x) do
+    quote do
+      {:right, unquote(x)}
+    end
+  end
 
   @doc """
   If `e` is a `{:left, v}` tuple `on_left` with `v`.
   If `e` is a `{:right, v}` tuple `on_right` with `v`.
   """
+  @spec either(either, (any -> any), (any -> any)) :: any
   def either(e, on_left, on_right)
   def either({:left, x}, f, _), do: f.(x)
   def either({:right, y}, _, g), do: g.(y)
