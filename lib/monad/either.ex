@@ -30,19 +30,29 @@ defmodule Monad.Either do
       {:left, "aborted"}
   """
 
+  @opaque left :: {:left, any}
+  @opaque right :: {:right, any}
+  @type either :: left | right
+
   ## Monad implementations
 
+  @spec bind(either, (any -> any)) :: either
   def bind(l = {:left, _}, _), do: l
   def bind({:right, x}, f), do: f.(x)
 
+  @doc """
+  Injects `x` into an Either monad.
+  """
+  @spec return(any) :: either
   def return(x), do: right(x)
 
   ## Auxiliary functions
 
   @doc """
-  Alias for `left/1`.
+  Signal failure.
   """
-  def fail(r), do: left(r)
+  @spec fail(any) :: either
+  def fail(reason), do: left(reason)
 
   @doc """
   Wraps a value in a `{:left, value}` tuple.
@@ -58,6 +68,7 @@ defmodule Monad.Either do
   If `e` is a `{:left, v}` tuple `on_left` with `v`.
   If `e` is a `{:right, v}` tuple `on_right` with `v`.
   """
+  @spec either(either, (any -> any), (any -> any)) :: any
   def either(e, on_left, on_right)
   def either({:left, x}, f, _), do: f.(x)
   def either({:right, y}, _, g), do: g.(y)
