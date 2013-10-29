@@ -13,6 +13,8 @@ defmodule Monad.Maybe do
 
   ## Examples
 
+      iex> alias Monad.Maybe
+      iex> require Maybe
       iex> Maybe.m do
       ...>   x <- {:just, 1}
       ...>   y <- {:just, 2}
@@ -20,6 +22,8 @@ defmodule Monad.Maybe do
       ...> end
       {:just, 3}
 
+      iex> alias Monad.Maybe
+      iex> require Maybe
       iex> Maybe.m do
       ...>   x <- {:just, 1}
       ...>   y <- :nothing

@@ -13,7 +13,8 @@ defmodule Monad.Error do
   ## Examples
 
       iex> alias Monad.Error
-      ...> Error.m do
+      iex> require Error
+      iex> Error.m do
       ...>   a <- {:ok, 1}
       ...>   b <- return 2
       ...>   return a + b
@@ -21,7 +22,8 @@ defmodule Monad.Error do
       {:ok, 3}
 
       iex> alias Monad.Error
-      ...> Error.m do
+      iex> require Error
+      iex> Error.m do
       ...>   a <- {:error, "aborted"}
       ...>   b <- {:ok, 1}
       ...>   return a + b
