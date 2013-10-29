@@ -111,7 +111,7 @@ defmodule Monad do
       end
   """
   
-  @moduledoc """
+  @doc """
   Helper for defining a monad.
 
   Just `use Monad` in your monad module and define `return/1` and
