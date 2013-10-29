@@ -10,7 +10,8 @@ defmodule Monad.Reader do
 
       iex> use Monad
       iex> alias Monad.Reader
-      iex> r = m Reader do
+      iex> require Reader
+      iex> r = Reader.m do
       ...>       a <- return 2
       ...>       b <- ask
       ...>       return a + b

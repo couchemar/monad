@@ -2,9 +2,10 @@ defmodule Monad.ReaderTest do
   use ExUnit.Case, async: true
 
   use Monad
-  alias Monad.Reader
   import Monad.Reader
-  
+  alias Monad.Reader
+  require Reader
+
   doctest Monad.Reader
 
   test "Monad.Reader left identity" do
@@ -26,13 +27,13 @@ defmodule Monad.ReaderTest do
   end
 
   test "Monad.Reader pipeline" do
-    assert run(10, (pl Reader, (ask |> (&return(&1+1)).()))) == 11 
+    assert run(10, (pl Reader, (ask |> (&return(&1+1)).()))) == 11
   end
 
   test "Monad.Reader ask" do
-    assert run(4, (m Reader do
+    assert run(4, (Reader.m do
                      x <- return 2
-                     y <- ask 
+                     y <- ask
                      return (x * y)
                    end)) == 8
   end
