@@ -14,7 +14,7 @@ defmodule Monad.Maybe do
   ## Examples
 
       iex> require Monad.Maybe, as: Maybe
-      ...> Maybe.m do
+      iex> Maybe.m do
       ...>   x <- {:just, 1}
       ...>   y <- {:just, 2}
       ...>   return x + y
