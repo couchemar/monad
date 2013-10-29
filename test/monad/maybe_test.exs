@@ -2,7 +2,7 @@ defmodule Monad.MaybeTest do
   use ExUnit.Case, async: true
 
   use Monad
-  
+
   alias Monad.Maybe
   alias Monad.Maybe, as: M
   import Monad.Maybe, except: [return: 1]
@@ -50,7 +50,7 @@ defmodule Monad.MaybeTest do
   test "Monad.Maybe failing bind" do
     assert (Maybe.m do
               x <- {:just, 2}
-              y <- Maybe.fail "Yes, we can"
+              y <- fail "Yes, we can"
               return (x * y)
             end) == :nothing
   end
