@@ -117,8 +117,8 @@ defmodule Monad.MaybeTest do
   end
 
   test "Monad.Maybe.cat_maybes/1" do
-    assert cat_maybes([:nothing, {:just, 1}, :nothing, {:just, 2}, {:just, 3}]) ==
-      [1, 2, 3]
+    assert cat_maybes([:nothing, {:just, 1}, :nothing, {:just, 2}, {:just, 3}])
+      == [1, 2, 3]
   end
 
   test "Monad.Maybe.map_maybes/1" do
