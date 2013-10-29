@@ -2,30 +2,34 @@ defmodule Monad.MaybeTest do
   use ExUnit.Case, async: true
 
   use Monad
-  import Monad.Maybe
+
+  alias Monad.Maybe
+  alias Monad.Maybe, as: M
+  import Monad.Maybe, except: [return: 1]
+  require Maybe
 
   doctest Monad.Maybe
 
   test "Monad.Maybe left identity" do
     f = fn (x) -> x * x end
     a = 2
-    assert bind(return(a), f) == f.(a)
+    assert bind(M.return(a), f) == f.(a)
   end
 
   test "Monad.Maybe right identity" do
-    m = return 42
-    assert bind(m, &return/1) == m
+    m = M.return 42
+    assert bind(m, &M.return/1) == m
   end
 
   test "Monad.Maybe associativity" do
     f = fn (x) -> x * x end
     g = fn (x) -> x - 1 end
-    m = return 2
-    assert bind(return(bind(m, f)), g) == bind(m, &bind(return(f.(&1)), g))
+    m = M.return 2
+    assert bind(M.return(bind(m, f)), g) == bind(m, &bind(M.return(f.(&1)), g))
   end
 
   test "Monad.Maybe successful bind" do
-    assert (m Monad.Maybe do
+    assert (Maybe.m do
               x <- {:just, 2}
               y <- {:just, 4}
               return (x * y)
@@ -33,7 +37,7 @@ defmodule Monad.MaybeTest do
   end
 
   test "Monad.Maybe succesful bind using `let`" do
-    assert (m Monad.Maybe do
+    assert (Maybe.m do
               let x = 2
               let do
                 y = 4
@@ -44,7 +48,7 @@ defmodule Monad.MaybeTest do
   end
 
   test "Monad.Maybe failing bind" do
-    assert (m Monad.Maybe do
+    assert (Maybe.m do
               x <- {:just, 2}
               y <- fail "Yes, we can"
               return (x * y)

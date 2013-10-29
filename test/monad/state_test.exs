@@ -2,9 +2,10 @@ defmodule Monad.StateTest do
   use ExUnit.Case, async: true
 
   use Monad
-  alias Monad.State
   import Monad.State
-  
+  alias Monad.State
+  require State
+
   doctest Monad.State
 
   test "Monad.State left identity" do
@@ -30,8 +31,8 @@ defmodule Monad.StateTest do
   end
 
   test "Monad.State get and put" do
-    assert run(4, (m State do
-                     let x = 2 
+    assert run(4, (State.m do
+                     let x = 2
                      y <- get
                      put x
                      return (x * y)

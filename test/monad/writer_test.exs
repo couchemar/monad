@@ -8,8 +8,7 @@ defmodule Monad.WriterTest do
   use ExUnit.Case, async: true
 
   use Monad
-  alias Monad.Writer
-  
+
   doctest Monad.Writer
 
   import WList
@@ -33,7 +32,7 @@ defmodule Monad.WriterTest do
   end
 
   test "Monad.Writer tell" do
-    assert run(m WList do
+    assert run(WList.m do
                  x <- return 2
                  tell [3]
                  tell [4]
