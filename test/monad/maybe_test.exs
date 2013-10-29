@@ -3,6 +3,8 @@ defmodule Monad.MaybeTest do
 
   use Monad
   import Monad.Maybe
+  alias Monad.Maybe
+  require Maybe
 
   doctest Monad.Maybe
 
@@ -25,7 +27,7 @@ defmodule Monad.MaybeTest do
   end
 
   test "Monad.Maybe successful bind" do
-    assert (m Monad.Maybe do
+    assert (Maybe.m do
               x <- {:just, 2}
               y <- {:just, 4}
               return (x * y)
