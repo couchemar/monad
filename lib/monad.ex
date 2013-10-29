@@ -13,8 +13,10 @@ defmodule Monad do
       def call_if_safe_div(f, x, y) do
         use Monad
         import Monad.Maybe
+        alias Monad.Maybe
+        require Maybe
 
-        m Monad.Maybe do
+        Maybe.m do
           result <- case y == 0 do
                       true  -> fail "division by zero"
                       false -> return x / y
@@ -191,7 +193,7 @@ defmodule Monad do
     # Enum.reduce is a left fold
     Macro.unpipe(pipeline) |> Enum.reduce(&(mod.pipebind(&2, &1)))
   end
- 
+
   @type monad :: any
 
   @doc """
@@ -283,7 +285,7 @@ defmodule Monad.Behaviour do
   defmacro __using__(_opts) do
     quote location: :keep do
       @behaviour Monad
-      
+
       @doc """
       Monad do-notation.
 
