@@ -26,8 +26,8 @@ defmodule Monad.MaybeTest do
 
   test "Monad.Maybe successful bind" do
     assert (m Monad.Maybe do
-              x <- just 2
-              y <- just 4
+              x <- {:just, 2}
+              y <- {:just, 4}
               return (x * y)
             end) == {:just, 8}
   end
@@ -45,55 +45,55 @@ defmodule Monad.MaybeTest do
 
   test "Monad.Maybe failing bind" do
     assert (m Monad.Maybe do
-              x <- just 2
+              x <- {:just, 2}
               y <- fail "Yes, we can"
               return (x * y)
             end) == :nothing
   end
 
   test "Monad.Maybe pipeline" do
-    assert (pl Monad.Maybe, (just(2) |> (&{:just, &1+2}).()))
+    assert (pl Monad.Maybe, ({:just, 2} |> (&{:just, &1+2}).()))
            == {:just, 4}
   end
 
   test "Monad.Maybe pipeline fail" do
-    assert (pl Monad.Maybe, (nothing |> (&{:just, &1+2}).()))
+    assert (pl Monad.Maybe, (:nothing |> (&{:just, &1+2}).()))
            == :nothing
   end
 
   test "Monad.Maybe.maybe/3 with just value" do
-    assert maybe(1, &(&1 + &1), just 2) == 4
+    assert maybe(1, &(&1 + &1), {:just, 2}) == 4
   end
 
   test "Monad.Maybe.maybe/3 with nothing value" do
-    assert maybe(1, &(&1 + &1), nothing) == 2
+    assert maybe(1, &(&1 + &1), :nothing) == 2
   end
   test "Monad.Maybe.is_just/1 with just value" do
-    assert is_just(just :whatever)
+    assert is_just({:just, :whatever})
   end
 
   test "Monad.Maybe.is_just/1 with nothing value" do
-    refute is_just(nothing)
+    refute is_just(:nothing)
   end
 
   test "Monad.Maybe.is_nothing/1 with nothing value" do
-    assert is_nothing(nothing)
+    assert is_nothing(:nothing)
   end
 
   test "Monad.Maybe.is_nothing/1 with just value" do
-    refute is_nothing(just :whatever)
+    refute is_nothing({:just, :whatever})
   end
 
   test "Monad.Maybe.from_just/1 with just value" do
-    assert from_just(just :value) == :value
+    assert from_just({:just, :value}) == :value
   end
 
   test "Monad.Maybe.from_just/1 with nothing value" do
-    assert_raise RuntimeError, fn () -> from_just(nothing) end
+    assert_raise RuntimeError, fn () -> from_just(:nothing) end
   end
 
   test "Monad.Maybe.from_maybe/2 with just value" do
-    assert from_maybe(:default, just :value) == :value
+    assert from_maybe(:default, {:just, :value}) == :value
   end
 
   test "Monad.Maybe.from_maybe/2 with nothing value" do
@@ -101,31 +101,31 @@ defmodule Monad.MaybeTest do
   end
 
   test "Monad.Maybe.maybe_to_list/1 with just value" do
-    assert maybe_to_list(just :value) == [:value]
+    assert maybe_to_list({:just, :value}) == [:value]
   end
 
   test "Monad.Maybe.maybe_to_list/1 with nothing value" do
-    assert maybe_to_list(nothing) == []
+    assert maybe_to_list(:nothing) == []
   end
 
   test "Monad.Maybe.list_to_maybe/1 with non-empty list" do
-    assert list_to_maybe([:value, :another_value]) == just :value
+    assert list_to_maybe([:value, :another_value]) == {:just, :value}
   end
 
   test "Monad.Maybe.list_to_maybe/1 with empty list" do
-    assert list_to_maybe([]) == nothing
+    assert list_to_maybe([]) == :nothing
   end
 
   test "Monad.Maybe.cat_maybes/1" do
-    assert cat_maybes([nothing, just(1), nothing, just(2), just(3)]) ==
-      [1, 2, 3]
+    assert cat_maybes([:nothing, {:just, 1}, :nothing, {:just, 2}, {:just, 3}])
+      == [1, 2, 3]
   end
 
   test "Monad.Maybe.map_maybes/1" do
     f = fn (x) ->
              case rem x, 2  do
-               0 -> just x
-               1 -> nothing
+               0 -> {:just, x}
+               1 -> :nothing
              end
         end
     assert map_maybes(f, [1, 2, 3, 4, 5]) == [2, 4]
