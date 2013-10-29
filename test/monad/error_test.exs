@@ -26,14 +26,14 @@ defmodule Monad.ErrorTest do
 
   test "Monad.Error successful bind" do
     assert (m Monad.Error do
-              x <- ok 2
+              x <- {:ok, 2}
               return x * x
             end) == {:ok, 4}
   end
 
   test "Monad.Error failing bind" do
     assert (m Monad.Error do
-              x <- error 2
+              x <- {:error, 2}
               return x * x
             end) == {:error, 2}
   end

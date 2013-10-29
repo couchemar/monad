@@ -35,22 +35,12 @@ defmodule Monad.Error do
   def bind(e = {:error, _}, _), do: e
   def bind({:ok, x}, f), do: f.(x)
 
-  def return(x), do: ok(x)
+  def return(x), do: {:ok, x}
 
   ## Auxiliary functions
 
   @doc """
-  Alias for `error/1`.
+  Signal failure.
   """
-  def fail(r), do: error(r)
-
-  @doc """
-  Wraps a value in a `{:error, value}` tuple.
-  """
-  def error(x), do: {:error, x}
-
-  @doc """
-  Wraps a value in a `{:ok, value}` tuple.
-  """
-  def ok(x), do: {:ok, x}
+  def fail(msg), do: {:error, msg}
 end
