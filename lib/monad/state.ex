@@ -10,7 +10,8 @@ defmodule Monad.State do
 
       iex> use Monad
       iex> alias Monad.State
-      iex> s = m State do
+      iex> require State
+      iex> s = State.m do
       ...>       a <- get
       ...>       put (a + 1)
       ...>       return a + 10
