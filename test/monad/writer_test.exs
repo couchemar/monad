@@ -5,9 +5,7 @@ defmodule WList do
 end
 
 defmodule Monad.WriterTest do
-  use ExUnit.Case, async: true
-
-  use Monad
+  use ExUnit.Case, async: true 
 
   doctest Monad.Writer
 

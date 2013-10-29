@@ -11,10 +11,8 @@ defmodule Monad do
   stuff like:
 
       def call_if_safe_div(f, x, y) do
-        use Monad
-        import Monad.Maybe
-        alias Monad.Maybe
-        require Maybe
+        require Monad.Maybe, as: Maybe
+        import Maybe 
 
         Maybe.m do
           result <- case y == 0 do
@@ -66,25 +64,26 @@ defmodule Monad do
 
   ## Pipe support
 
-  The `pl` macro supports monadic pipelines. For example:
+  For monads that implement the `Monad.Pipeline` behaviour the `p` macro
+  supports monadic pipelines. For example:
 
-      pl Error, (File.read("/tmp/foo")
-                 |> Code.string_to_quoted(file: "/tmp/foo")
-                 |> Macro.safe_term)
+      Error.p, (File.read("/tmp/foo")
+                |> Code.string_to_quoted(file: "/tmp/foo")
+                |> Macro.safe_term)
 
   If any of the terms returns `{:error, x}` that's the return value of the
   pipeline, if `{:ok, x}` is returned the `x` is passed to the next item.
 
   For a slightly nicer look this is also supported:
 
-      pl Error do
+      Error.p do
         File.read("/tmp/foo")
         |> Code.string_to_quoted(file: "/tmp/foo")
         |> Macro.safe_term)
       end
 
   Under the hood pipe binding works by calling the `pipebind` function in a
-  monad module. If you use `use Monad.Behaviour` one is automatically created
+  monad module. If you use `use Monad.Pipeline` one is automatically created
   (you can still override it though).
 
   The `pipebind` function receives the AST form of a value argument and a
@@ -111,16 +110,6 @@ defmodule Monad do
         end
       end
   """
-
-  @doc """
-  Make the `m` and `pl` macros available in your module.
-  """
-  defmacro __using__(_opts) do
-    quote location: :keep do
-      require Monad
-      import Monad, only: [m: 2, pl: 2]
-    end
-  end
 
   @doc """
   Monad do-notation.
@@ -174,26 +163,6 @@ defmodule Monad do
     end]
   end
 
-  defmacro pl(mod, pipeline) when is_list(pipeline) do
-    mod = Macro.expand(mod, __CALLER__)
-    case pipeline[:do] do
-      nil                         ->
-        raise ArgumentError, message:
-          "Monad.pl called with a list but it's not a keyword list with " <>
-          "a 'do' key (i.e. not a passed do block)"
-      { __block__, _, [expr] }    -> pl_expand(mod, expr)
-      expr                        -> pl_expand(mod, expr)
-    end
-  end
-  defmacro pl(mod, pipeline) do
-    pl_expand(Macro.expand(mod, __CALLER__), pipeline)
-  end
-
-  defp pl_expand(mod, pipeline) do
-    # Enum.reduce is a left fold
-    Macro.unpipe(pipeline) |> Enum.reduce(&(mod.pipebind(&2, &1)))
-  end
-
   @type monad :: any
 
   @doc """
@@ -206,12 +175,6 @@ defmodule Monad do
   value.
   """
   @callback bind(monad, (any -> monad)) :: monad
-
-  @doc """
-  Like bind/2 but works on ASTs and the second argument should be a function
-  call where the first argument is missing.
-  """
-  @callback pipebind(Macro.t, Macro.t) :: Macro.t
 end
 
 defmodule Monad.Internal do
@@ -275,6 +238,60 @@ defmodule Monad.Internal do
   end
 end
 
+defmodule Monad.Pipeline do
+  @moduledoc """
+  Helper for defining a monad that supports pipelines.
+
+  Just `use Monad.Behaviour` in your monad module and define `return/1` and
+  `bind/2` and you get `pipebind/2` for free.
+  """
+  defmacro __using__(_opts) do
+    quote location: :keep do
+      @behaviour Monad.Pipeline
+      @doc """
+      Pipeline form of the monad.
+
+      See `Monad` module documentation.
+      """
+      defmacro p(pipeline) when is_list(pipeline) do
+        case pipeline[:do] do
+          nil                         ->
+            raise ArgumentError, message:
+              "Monad.p called with a list but it's not a keyword list with " <>
+              "a 'do' key (i.e. not a passed do block)"
+          { __block__, _, [expr] }    -> p_expand(expr)
+          expr                        -> p_expand(expr)
+        end
+      end
+      defmacro p(pipeline), do: p_expand(pipeline)
+
+      defp p_expand(pipeline) do
+        # Enum.reduce is a left fold
+        Macro.unpipe(pipeline)
+        |> Enum.reduce(&(__MODULE__.pipebind(&2, &1)))
+      end
+
+      def pipebind(x, fc) do
+        quote location: :keep do
+          # I think there should be no conflict with the variable used in `fn`,
+          # but just to be sure let's use an odd variable name.
+          bind(unquote(x), fn _monad_pipebind_arg ->
+            unquote(Macro.pipe(quote do _monad_pipebind_arg end, fc))
+          end)
+        end
+      end
+
+      defoverridable [pipebind: 2]
+    end
+  end
+
+  @doc """
+  Like bind/2 but works on ASTs and the second argument should be a function
+  call where the first argument is missing.
+  """
+  @callback pipebind(Macro.t, Macro.t) :: Macro.t
+end
+
 defmodule Monad.Behaviour do
   @moduledoc """
   Helper for defining a monad.
@@ -304,18 +321,6 @@ defmodule Monad.Behaviour do
         end
         Monad.Internal.transform_return(__MODULE__, res)
       end
-
-      def pipebind(x, fc) do
-        quote location: :keep do
-          # I think there should be no conflict with the variable used in `fn`,
-          # but just to be sure let's use an odd variable name.
-          bind(unquote(x), fn _monad_pipebind_arg ->
-            unquote(Macro.pipe(quote do _monad_pipebind_arg end, fc))
-          end)
-        end
-      end
-
-      defoverridable [pipebind: 2]
     end
   end
 end

@@ -1,12 +1,10 @@
 defmodule Monad.StateTest do
   use ExUnit.Case, async: true
 
-  use Monad
-  import Monad.State
-  alias Monad.State
-  require State
+  require Monad.State, as: State
+  import State
 
-  doctest Monad.State
+  doctest State
 
   test "Monad.State left identity" do
     f = fn (x) -> return(x * x) end
@@ -24,10 +22,6 @@ defmodule Monad.StateTest do
     g = fn (x) -> return(x - 1) end
     m = return 2
     assert run(10, bind(m, f) |> bind(g)) == run(10, bind(m, &bind(f.(&1), g)))
-  end
-
-  test "Monad.State pipeline" do
-    assert run(10, (pl State, (get |> (&return(&1+1)).() |> put))) == {nil, 11}
   end
 
   test "Monad.State get and put" do

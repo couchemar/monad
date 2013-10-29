@@ -1,5 +1,6 @@
 defmodule Monad.Maybe do
   use Monad.Behaviour
+  use Monad.Pipeline
 
   @moduledoc """
   The Maybe monad.

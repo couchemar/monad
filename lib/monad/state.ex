@@ -8,9 +8,8 @@ defmodule Monad.State do
 
   ## Examples
 
-      iex> use Monad
-      iex> alias Monad.State
-      iex> require State
+      iex> require Monad.State, as: State
+      iex> import State
       iex> s = State.m do
       ...>       a <- get
       ...>       put (a + 1)

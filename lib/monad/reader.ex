@@ -8,9 +8,8 @@ defmodule Monad.Reader do
 
   ## Examples
 
-      iex> use Monad
-      iex> alias Monad.Reader
-      iex> require Reader
+      iex> require Monad.Reader, as: Reader
+      iex> import Reader
       iex> r = Reader.m do
       ...>       a <- return 2
       ...>       b <- ask

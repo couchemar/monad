@@ -1,31 +1,27 @@
 defmodule Monad.MaybeTest do
   use ExUnit.Case, async: true
 
-  use Monad
+  require Monad.Maybe, as: Maybe
+  import Maybe
 
-  alias Monad.Maybe
-  alias Monad.Maybe, as: M
-  import Monad.Maybe, except: [return: 1]
-  require Maybe
-
-  doctest Monad.Maybe
+  doctest Maybe
 
   test "Monad.Maybe left identity" do
     f = fn (x) -> x * x end
     a = 2
-    assert bind(M.return(a), f) == f.(a)
+    assert bind(return(a), f) == f.(a)
   end
 
   test "Monad.Maybe right identity" do
-    m = M.return 42
-    assert bind(m, &M.return/1) == m
+    m = return 42
+    assert bind(m, &return/1) == m
   end
 
   test "Monad.Maybe associativity" do
     f = fn (x) -> x * x end
     g = fn (x) -> x - 1 end
-    m = M.return 2
-    assert bind(M.return(bind(m, f)), g) == bind(m, &bind(M.return(f.(&1)), g))
+    m = return 2
+    assert bind(return(bind(m, f)), g) == bind(m, &bind(return(f.(&1)), g))
   end
 
   test "Monad.Maybe successful bind" do
@@ -56,12 +52,12 @@ defmodule Monad.MaybeTest do
   end
 
   test "Monad.Maybe pipeline" do
-    assert (pl Monad.Maybe, ({:just, 2} |> (&{:just, &1+2}).()))
+    assert Monad.Maybe.p({:just, 2} |> (&{:just, &1+2}).())
            == {:just, 4}
   end
 
   test "Monad.Maybe pipeline fail" do
-    assert (pl Monad.Maybe, (:nothing |> (&{:just, &1+2}).()))
+    assert Monad.Maybe.p(:nothing |> (&{:just, &1+2}).())
            == :nothing
   end
 
