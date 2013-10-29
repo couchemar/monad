@@ -212,6 +212,48 @@ defmodule Monad do
   @callback pipebind(Macro.t, Macro.t) :: Macro.t
 end
 
+defmodule Monad.Internal do
+  # Internal helpers for the monad stuff.
+  @moduledoc false
+
+  @doc false
+  def expand(mod, [{:let, _, let_exprs} | exprs]) do
+    if length(let_exprs) == 1 and is_list(hd(let_exprs)) do
+      case Keyword.fetch(hd(let_exprs), :do) do
+        :error ->
+          let_exprs ++ expand(mod, exprs)
+        {:ok, e} ->
+          [e | expand(mod, exprs)]
+      end
+    else
+      let_exprs ++ expand(mod, exprs)
+    end
+  end
+  def expand(mod, [{:<-, _, [lhs, rhs]} | exprs]) do
+    # x <- m ==> bind(b, fn x -> ... end)
+    expand_bind(mod, lhs, rhs, exprs)
+  end
+  def expand(_, [expr]) do
+    [expr]
+  end
+  def expand(mod, [expr | exprs]) do
+    # m ==> bind(b, fn _ -> ... end)
+    expand_bind(mod, quote(do: _), expr, exprs)
+  end
+  def expand(_, []) do
+    []
+  end
+
+  defp expand_bind(mod, lhs, rhs, exprs) do
+    [quote do
+      unquote(mod).bind(unquote(rhs),
+                        fn unquote(lhs) ->
+                             unquote_splicing(expand(mod, exprs))
+                        end)
+    end]
+  end
+end
+
 defmodule Monad.Behaviour do
   @moduledoc """
   Helper for defining a monad.
@@ -220,8 +262,28 @@ defmodule Monad.Behaviour do
   `bind/2` and you get `pipebind/2` for free.
   """
   defmacro __using__(_opts) do
-    quote do
+    quote location: :keep do
       @behaviour Monad
+      
+      @doc """
+      Monad do-notation.
+
+      See the `Monad` module documentation and the
+      """ <> "`#{inspect __MODULE__}`" <> """
+      module documentation
+      """
+      defmacro m(do: block) do
+        imp = quote do import unquote(__MODULE__), only: [return: 1] end
+        case block do
+          nil ->
+            raise ArgumentError, message: "missing or empty do block"
+          {:__block__, meta, exprs} ->
+            {:__block__, meta, [imp|Monad.Internal.expand(__MODULE__, exprs)]}
+          expr ->
+            {:__block__, [], [imp|Monad.Internal.expand(__MODULE__, [expr])]}
+        end
+      end
+
       def pipebind(x, fc) do
         quote location: :keep do
           # I think there should be no conflict with the variable used in `fn`,
@@ -231,6 +293,7 @@ defmodule Monad.Behaviour do
           end)
         end
       end
+
       defoverridable [pipebind: 2]
     end
   end
