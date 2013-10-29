@@ -2,7 +2,7 @@ defmodule Monad.Writer do
   @moduledoc """
   The Writer monad.
 
-  Allows saving output values "under the hood". 
+  Allows saving output values "under the hood".
 
   To use this you'll first need to create a writer module with the desired
   combining semantics.
@@ -20,13 +20,13 @@ defmodule Monad.Writer do
         def initial, do: []
         def combine(new, acc), do: acc ++ new
       end
-     
+
       # In the module.
       alias ListWriter, as: LW
       use Monad
       w = m ListWriter do
             LW.tell [1]
-            a <- return 2 
+            a <- return 2
             LW.tell [2]
             return a + 1
           end
@@ -38,41 +38,41 @@ defmodule Monad.Writer do
   Represents the output type of the monad in typespecs.
   """
   @type output :: any
- 
+
   # A writer is just a function that outputs an "under the hood" value
   # or the under the hood value directly.
-  @opaque m :: (() -> {any, output})
+  @opaque writer_m :: (() -> {any, output})
 
-  defmacro __using__(_env) do 
+  defmacro __using__(_env) do
     quote do
       use Monad.Behaviour
-      
+
       @behaviour Monad.Writer
-      
+
       alias Monad.Writer, as: W
 
-      @spec bind(W.m, ((any) -> W.m)) :: W.m
+      @spec bind(W.writer_m, ((any) -> W.writer_m)) :: W.writer_m
       def bind(w, f) do
-        fn -> 
+        fn ->
           { x, acc } = w.()
           { y, new } = f.(x).()
           { y, combine(new, acc) }
         end
       end
 
-      @spec return(any) :: W.m
+      @spec return(any) :: W.writer_m
       def return(x), do: fn -> { x, initial } end
-      
+
       @doc """
       Run the writer. Returns the return value and the output value.
       """
-      @spec run(W.m) :: { any, W.output }
+      @spec run(W.writer_m) :: { any, W.output }
       def run(m), do: m.()
 
       @doc """
       Add a value to the output. Returns `nil`.
       """
-      @spec tell(W.output) :: W.m
+      @spec tell(W.output) :: W.writer_m
       def tell(o), do: fn -> {nil, o} end
     end
   end
