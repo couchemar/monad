@@ -2,8 +2,10 @@ defmodule Monad.MaybeTest do
   use ExUnit.Case, async: true
 
   use Monad
-  import Monad.Maybe
+  
   alias Monad.Maybe
+  alias Monad.Maybe, as: M
+  import Monad.Maybe, except: [return: 1]
   require Maybe
 
   doctest Monad.Maybe
@@ -11,19 +13,19 @@ defmodule Monad.MaybeTest do
   test "Monad.Maybe left identity" do
     f = fn (x) -> x * x end
     a = 2
-    assert bind(return(a), f) == f.(a)
+    assert bind(M.return(a), f) == f.(a)
   end
 
   test "Monad.Maybe right identity" do
-    m = return 42
-    assert bind(m, &return/1) == m
+    m = M.return 42
+    assert bind(m, &M.return/1) == m
   end
 
   test "Monad.Maybe associativity" do
     f = fn (x) -> x * x end
     g = fn (x) -> x - 1 end
-    m = return 2
-    assert bind(return(bind(m, f)), g) == bind(m, &bind(return(f.(&1)), g))
+    m = M.return 2
+    assert bind(M.return(bind(m, f)), g) == bind(m, &bind(M.return(f.(&1)), g))
   end
 
   test "Monad.Maybe successful bind" do

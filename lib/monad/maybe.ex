@@ -13,16 +13,16 @@ defmodule Monad.Maybe do
 
   ## Examples
 
-      iex> alias Monad.Maybe
-      ...> m Maybe do
+      iex> require Monad.Maybe, as: Maybe
+      ...> Maybe.m do
       ...>   x <- {:just, 1}
       ...>   y <- {:just, 2}
       ...>   return x + y
       ...> end
       {:just, 3}
 
-      iex> alias Monad.Maybe
-      iex> m Maybe do
+      iex> require Monad.Maybe, as: Maybe
+      iex> Maybe.m do
       ...>   x <- {:just, 1}
       ...>   y <- :nothing
       ...>   return x + y

@@ -252,6 +252,25 @@ defmodule Monad.Internal do
                         end)
     end]
   end
+
+  @doc false
+  # Find unqualified mentions of `return` in the AST and translate them to
+  # `mod.return`.
+  def transform_return(mod, {:return, _, [arg]} ) do
+    quote do unquote(mod).return(unquote(arg)) end
+  end
+  def transform_return(mod, {call, meta, args}) do
+    {call, meta, transform_return(mod, args)}
+  end
+  def transform_return(mod, l) when is_list(l) do
+    Enum.map(l, &transform_return(mod, &1))
+  end
+  def transform_return(mod, {l, r}) do
+    { transform_return(mod, l), transform_return(mod, r) }
+  end
+  def transform_return(mod, x) do
+    x
+  end
 end
 
 defmodule Monad.Behaviour do
@@ -273,15 +292,15 @@ defmodule Monad.Behaviour do
       module documentation
       """
       defmacro m(do: block) do
-        imp = quote do import unquote(__MODULE__), only: [return: 1] end
-        case block do
+        res = case block do
           nil ->
             raise ArgumentError, message: "missing or empty do block"
           {:__block__, meta, exprs} ->
-            {:__block__, meta, [imp|Monad.Internal.expand(__MODULE__, exprs)]}
+            {:__block__, meta, Monad.Internal.expand(__MODULE__, exprs)}
           expr ->
-            {:__block__, [], [imp|Monad.Internal.expand(__MODULE__, [expr])]}
+            {:__block__, [], Monad.Internal.expand(__MODULE__, [expr])}
         end
+        Monad.Internal.transform_return(__MODULE__, res)
       end
 
       def pipebind(x, fc) do
