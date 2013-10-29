@@ -16,15 +16,15 @@ defmodule Monad.Maybe do
       iex> use Monad
       iex> alias Monad.Maybe
       iex> m Maybe do
-      ...>   x <- just 1
-      ...>   y <- just 2
+      ...>   x <- {:just, 1}
+      ...>   y <- {:just, 2}
       ...>   return x + y
       ...> end
-      just 3
+      {:just, 3}
 
       iex> alias Monad.Maybe
       iex> m Maybe do
-      ...>   x <- just 1
+      ...>   x <- {:just, 1}
       ...>   y <- :nothing
       ...>   return x + y
       ...> end
@@ -55,15 +55,6 @@ defmodule Monad.Maybe do
   """
   @spec fail(any) :: maybe
   def fail(_), do: :nothing
-
-  @doc """
-  Returns `just x`.
-  """
-  defmacro just(x) do
-    quote do
-      {:just, unquote(x)}
-    end
-  end
 
   @doc """
   Call function `f` with the value inside the maybe value `m` if `m` is `just`,
@@ -115,7 +106,7 @@ defmodule Monad.Maybe do
       iex> maybe_to_list :nothing
       []
 
-      iex> maybe_to_list just(42)
+      iex> maybe_to_list {:just, 42}
       [42]
 
   """
@@ -136,12 +127,12 @@ defmodule Monad.Maybe do
       :nothing
 
       iex> list_to_maybe [1, 2, 3]
-      just 1
+      {:just, 1}
 
   """
   @spec list_to_maybe([any]) :: maybe
   def list_to_maybe(l)
-  def list_to_maybe([x | _]), do: just x
+  def list_to_maybe([x | _]), do: {:just, x}
   def list_to_maybe([]), do: :nothing
 
   @doc """
@@ -149,7 +140,7 @@ defmodule Monad.Maybe do
 
   ## Example
 
-      iex> cat_maybes [just(1), :nothing, just(2), :nothing, just(3)]
+      iex> cat_maybes [{:just, 1}, :nothing, {:just, 2}, :nothing, {:just, 3}]
       [1, 2, 3]
 
   """
