@@ -35,7 +35,7 @@ defmodule Monad.MaybeTest do
   end
 
   test "Monad.Maybe succesful bind using `let`" do
-    assert (m Monad.Maybe do
+    assert (Maybe.m do
               let x = 2
               let do
                 y = 4
@@ -46,7 +46,7 @@ defmodule Monad.MaybeTest do
   end
 
   test "Monad.Maybe failing bind" do
-    assert (m Monad.Maybe do
+    assert (Maybe.m do
               x <- {:just, 2}
               y <- fail "Yes, we can"
               return (x * y)
