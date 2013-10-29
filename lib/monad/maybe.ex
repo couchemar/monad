@@ -25,17 +25,10 @@ defmodule Monad.Maybe do
       iex> alias Monad.Maybe
       iex> m Maybe do
       ...>   x <- just 1
-      ...>   y <- nothing
+      ...>   y <- :nothing
       ...>   return x + y
       ...> end
-      nothing
-
-  ## Internal Representation
-
-  Currently this module uses `{:just, x}` and `:nothing` to represent `just x`
-  and `nothing` respectively, but please do _not_ use these in your code,
-  e.g. on the left-hand side of a pattern match. Use the `just/1` and
-  `nothing/0` macros instead to prevent future breakage.
+      :nothing
   """
 
   @opaque just :: {:just, any}
@@ -60,7 +53,7 @@ defmodule Monad.Maybe do
   @doc """
   Signal failure.
   """
-  @spec fail(any) :: nothing
+  @spec fail(any) :: maybe
   def fail(_), do: :nothing
 
   @doc """
@@ -70,13 +63,6 @@ defmodule Monad.Maybe do
     quote do
       {:just, unquote(x)}
     end
-  end
-
-  @doc """
-  Returns `nothing`.
-  """
-  defmacro nothing do
-    quote do: :nothing
   end
 
   @doc """
@@ -126,7 +112,7 @@ defmodule Monad.Maybe do
 
   ## Examples
 
-      iex> maybe_to_list nothing
+      iex> maybe_to_list :nothing
       []
 
       iex> maybe_to_list just(42)
@@ -147,7 +133,7 @@ defmodule Monad.Maybe do
   ## Examples
 
       iex> list_to_maybe []
-      nothing
+      :nothing
 
       iex> list_to_maybe [1, 2, 3]
       just 1
@@ -156,14 +142,14 @@ defmodule Monad.Maybe do
   @spec list_to_maybe([any]) :: maybe
   def list_to_maybe(l)
   def list_to_maybe([x | _]), do: just x
-  def list_to_maybe([]), do: nothing
+  def list_to_maybe([]), do: :nothing
 
   @doc """
   Takes a list of `maybe`s and returns a list of all the `just` values.
 
   ## Example
 
-      iex> cat_maybes [just(1), nothing, just(2), nothing, just(3)]
+      iex> cat_maybes [just(1), :nothing, just(2), :nothing, just(3)]
       [1, 2, 3]
 
   """
