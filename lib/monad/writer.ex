@@ -24,7 +24,7 @@ defmodule Monad.Writer do
       # In the module.
       alias ListWriter, as: LW
       use Monad
-      w = m ListWriter do
+      w = ListWriter.m do
             LW.tell [1]
             a <- return 2
             LW.tell [2]
