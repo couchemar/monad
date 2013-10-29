@@ -30,11 +30,16 @@ defmodule Monad.Error do
       {:error, "aborted"}
   """
 
+  @type error_m :: {:error, any} | {:ok, any}
+
   ## Monad implementations
 
+  @spec bind(error_m, (any -> any)) :: error_m
+  def bind(m, f)
   def bind(e = {:error, _}, _), do: e
   def bind({:ok, x}, f), do: f.(x)
 
+  @spec return(any) :: error_m
   def return(x), do: {:ok, x}
 
   ## Auxiliary functions
@@ -42,5 +47,6 @@ defmodule Monad.Error do
   @doc """
   Signal failure.
   """
+  @spec fail(any) :: error_m
   def fail(msg), do: {:error, msg}
 end
