@@ -3,6 +3,8 @@ defmodule Monad.ErrorTest do
 
   use Monad
   import Monad.Error
+  alias Monad.Error
+  require Error
 
   doctest Monad.Error
 
@@ -25,14 +27,14 @@ defmodule Monad.ErrorTest do
   end
 
   test "Monad.Error successful bind" do
-    assert (m Monad.Error do
+    assert (Error.m do
               x <- {:ok, 2}
               return x * x
             end) == {:ok, 4}
   end
 
   test "Monad.Error failing bind" do
-    assert (m Monad.Error do
+    assert (Error.m do
               x <- {:error, 2}
               return x * x
             end) == {:error, 2}
