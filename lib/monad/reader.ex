@@ -1,5 +1,5 @@
 defmodule Monad.Reader do
-  use Monad.Behaviour
+  use Monad
 
   @moduledoc """
   The Reader monad.

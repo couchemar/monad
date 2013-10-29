@@ -1,5 +1,5 @@
 defmodule Monad.State do
-  use Monad.Behaviour
+  use Monad
 
   @moduledoc """
   The State monad.

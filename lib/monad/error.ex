@@ -1,5 +1,5 @@
 defmodule Monad.Error do
-  use Monad.Behaviour
+  use Monad
   use Monad.Pipeline
 
   @moduledoc """

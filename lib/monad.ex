@@ -110,57 +110,36 @@ defmodule Monad do
         end
       end
   """
+  
+  @moduledoc """
+  Helper for defining a monad.
 
-  @doc """
-  Monad do-notation.
-
-  See the `Monad` module documentation.
+  Just `use Monad` in your monad module and define `return/1` and
+  `bind/2` to get the `m` macro.
   """
-  defmacro m(mod, do: block) do
-    case block do
-      nil ->
-        raise ArgumentError, message: "missing or empty do block"
-      {:__block__, meta, exprs} ->
-        {:__block__, meta, expand(mod, exprs)}
-      expr ->
-        {:__block__, [], expand(mod, [expr])}
-    end
-  end
+  defmacro __using__(_opts) do
+    quote location: :keep do
+      @behaviour Monad
 
-  defp expand(mod, [{:let, _, let_exprs} | exprs]) do
-    if length(let_exprs) == 1 and is_list(hd(let_exprs)) do
-      case Keyword.fetch(hd(let_exprs), :do) do
-        :error ->
-          let_exprs ++ expand(mod, exprs)
-        {:ok, e} ->
-          [e | expand(mod, exprs)]
+      @doc """
+      Monad do-notation.
+
+      See the `Monad` module documentation and the
+      """ <> "`#{inspect __MODULE__}`" <> """
+      module documentation
+      """
+      defmacro m(do: block) do
+        res = case block do
+          nil ->
+            raise ArgumentError, message: "missing or empty do block"
+          {:__block__, meta, exprs} ->
+            {:__block__, meta, Monad.Internal.expand(__MODULE__, exprs)}
+          expr ->
+            {:__block__, [], Monad.Internal.expand(__MODULE__, [expr])}
+        end
+        Monad.Internal.transform_return(__MODULE__, res)
       end
-    else
-      let_exprs ++ expand(mod, exprs)
     end
-  end
-  defp expand(mod, [{:<-, _, [lhs, rhs]} | exprs]) do
-    # x <- m ==> bind(b, fn x -> ... end)
-    expand_bind(mod, lhs, rhs, exprs)
-  end
-  defp expand(_, [expr]) do
-    [expr]
-  end
-  defp expand(mod, [expr | exprs]) do
-    # m ==> bind(b, fn _ -> ... end)
-    expand_bind(mod, quote(do: _), expr, exprs)
-  end
-  defp expand(_, []) do
-    []
-  end
-
-  defp expand_bind(mod, lhs, rhs, exprs) do
-    [quote do
-      unquote(mod).bind(unquote(rhs),
-                        fn unquote(lhs) ->
-                             unquote_splicing(expand(mod, exprs))
-                        end)
-    end]
   end
 
   @type monad :: any
@@ -290,37 +269,4 @@ defmodule Monad.Pipeline do
   call where the first argument is missing.
   """
   @callback pipebind(Macro.t, Macro.t) :: Macro.t
-end
-
-defmodule Monad.Behaviour do
-  @moduledoc """
-  Helper for defining a monad.
-
-  Just `use Monad.Behaviour` in your monad module and define `return/1` and
-  `bind/2` and you get `pipebind/2` for free.
-  """
-  defmacro __using__(_opts) do
-    quote location: :keep do
-      @behaviour Monad
-
-      @doc """
-      Monad do-notation.
-
-      See the `Monad` module documentation and the
-      """ <> "`#{inspect __MODULE__}`" <> """
-      module documentation
-      """
-      defmacro m(do: block) do
-        res = case block do
-          nil ->
-            raise ArgumentError, message: "missing or empty do block"
-          {:__block__, meta, exprs} ->
-            {:__block__, meta, Monad.Internal.expand(__MODULE__, exprs)}
-          expr ->
-            {:__block__, [], Monad.Internal.expand(__MODULE__, [expr])}
-        end
-        Monad.Internal.transform_return(__MODULE__, res)
-      end
-    end
-  end
 end
