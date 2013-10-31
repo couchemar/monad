@@ -153,13 +153,12 @@ defmodule Monad do
   @type monad :: any
 
   @doc """
-  Put a value in the monad.
+  Injects a value into a monad.
   """
   @callback return(any) :: monad
 
   @doc """
-  Bind a value in the monad to the passed function which returns a new monadic
-  value.
+  Bind a value in the monad to the passed function which returns a new monad.
   """
   @callback bind(monad, (any -> monad)) :: monad
 end
