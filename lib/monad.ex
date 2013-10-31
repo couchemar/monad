@@ -153,7 +153,7 @@ defmodule Monad do
   @type monad :: any
 
   @doc """
-  Injects a value into a monad.
+  Inject a value into a monad.
   """
   @callback return(any) :: monad
 
