@@ -7,12 +7,12 @@ defmodule Monad do
   ## Usage
 
   To use do-notation you need a module that implements Monad's callbacks,
-  i.e. the module needs to have `return/1`, `bind/2`.  This allows you to write
-  stuff like:
+  i.e. the module needs to have `return/1` and `bind/2`.  This allows you to
+  write stuff like:
 
       def call_if_safe_div(f, x, y) do
         require Monad.Maybe, as: Maybe
-        import Maybe 
+        import Maybe
 
         Maybe.m do
           result <- case y == 0 do
@@ -22,6 +22,12 @@ defmodule Monad do
           return f.(result)
         end
       end
+
+  The example above uses the `Maybe` monad to define `call_if_safe_div/3`. This
+  function takes three arguments: a function `f` and two numbers `x` and `y`. If
+  `x` is divisible by `y`, then `f` is called with `x / y` and the return value
+  is `{:just, f.(x / y)}`, else the computation fails and the return value is
+  `:nothing`.
 
   ## Terminology
 
@@ -110,7 +116,7 @@ defmodule Monad do
         end
       end
   """
-  
+
   @doc """
   Helper for defining a monad.
 
