@@ -45,7 +45,7 @@ defmodule Monad.Writer do
 
   defmacro __using__(_env) do
     quote do
-      use Monad.Behaviour
+      use Monad
 
       @behaviour Monad.Writer
 
