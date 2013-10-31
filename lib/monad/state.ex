@@ -6,8 +6,8 @@ defmodule Monad.State do
 
   The State monad allows for stateful computations while using pure
   functions. Computations of this kind can be represented by state transformers,
-  i.e. by functions that map an initial state to a result value paired with the
-  a final state.
+  i.e. by functions that map an initial state to a result value paired with a
+  final state.
 
   ## Examples
 
