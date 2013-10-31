@@ -228,8 +228,8 @@ defmodule Monad.Pipeline do
   @moduledoc """
   Helper for defining monads that supports pipelines.
 
-  Just `use Monad.Behaviour` in your monad module and define `return/1` and
-  `bind/2` and you get `pipebind/2` for free.
+  Just use `use Monad.Pipeline` in your monad module and define `return/1` and
+  `bind/2` and get `pipebind/2` for free.
   """
   defmacro __using__(_opts) do
     quote location: :keep do
