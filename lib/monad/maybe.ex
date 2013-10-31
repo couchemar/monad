@@ -36,12 +36,17 @@ defmodule Monad.Maybe do
   ## Monad implementations
 
   @spec bind(maybe_m, (any -> maybe_m)) :: maybe_m
+  @doc """
+  Bind the value inside Maybe monad `m` to function `f`.
+
+  Note that the computation shortcircuits if `m` is `:nothing`.
+  """
   def bind(m, f)
   def bind({:just, x}, f), do: f.(x)
   def bind(:nothing, _), do: :nothing
 
   @doc """
-  Injects `x` into a Maybe monad.
+  Inject `x` into a Maybe monad, i.e. returns `{:just, x}`.
   """
   @spec return(any) :: maybe_m
   def return(x), do: {:just, x}
@@ -49,9 +54,10 @@ defmodule Monad.Maybe do
   ## Auxiliary functions
 
   @doc """
-  Signal failure.
+  Signal failure, i.e. returns `:nothing`.
   """
   @spec fail(any) :: maybe_m
+  def fail(msg)
   def fail(_), do: :nothing
 
   @doc """
