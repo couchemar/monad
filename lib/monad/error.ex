@@ -25,7 +25,7 @@ defmodule Monad.Error do
       iex> alias Monad.Error
       iex> require Error
       iex> Error.m do
-      ...>   a <- {:error, "aborted"}
+      ...>   a <- fail "aborted"
       ...>   b <- {:ok, 1}
       ...>   return a + b
       ...> end
