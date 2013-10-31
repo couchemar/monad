@@ -34,20 +34,28 @@ defmodule Monad.Error do
 
   @type error_m :: {:error, any} | {:ok, any}
 
-  ## Monad implementations
+  ## Monad callback implementations
 
-  @spec bind(error_m, (any -> any)) :: error_m
+  @spec bind(error_m, (any -> error_m)) :: error_m
+  @doc """
+  Bind the value inside Error monad `m` to function `f`.
+
+  Note that the computation shortcircuits if `m` is an `error` value.
+  """
   def bind(m, f)
   def bind(e = {:error, _}, _), do: e
   def bind({:ok, x}, f), do: f.(x)
 
+  @doc """
+  Inject `x` into a Error monad, i.e. returns {:ok, x}.
+  """
   @spec return(any) :: error_m
   def return(x), do: {:ok, x}
 
   ## Auxiliary functions
 
   @doc """
-  Signal failure.
+  Signal failure, i.e. returns `{:error, msg}`.
   """
   @spec fail(any) :: error_m
   def fail(msg), do: {:error, msg}
