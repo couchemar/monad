@@ -4,7 +4,10 @@ defmodule Monad.State do
   @moduledoc """
   The State monad.
 
-  Allows keeping state "under the hood".
+  The State monad allows for stateful computations while using pure
+  functions. Computations of this kind can be represented by state transformers,
+  i.e. by functions that map an initial state to a result value paired with the
+  a final state.
 
   ## Examples
 
@@ -22,11 +25,11 @@ defmodule Monad.State do
   # A state monad is just a function that receives the "under the hood" state
   # value and returns a new state.
   @type state :: any
-  @opaque state_m :: ((state) -> {any, state})
+  @opaque state_m :: (state -> {any, state})
 
   ## Monad implementations
 
-  @spec bind(state_m, ((any) -> state_m)) :: state_m
+  @spec bind(state_m, (any -> state_m)) :: state_m
   def bind(s, f) do
     fn st ->
       {x, st1} = s.(st)
@@ -35,16 +38,21 @@ defmodule Monad.State do
   end
 
   @spec return(any) :: state_m
+  @doc """
+  Inject `x` into a State monad.
+  """
   def return(x), do: fn st -> {x, st} end
 
   ## Other functions
 
   @doc """
-  Run the state by supplying the given value to it and returning the return
-  value of the monad and the final state.
+  Run the State monad `m` with `x` as the value of the initial state.
+
+  Returns a tuple where the first element is the result of the computation and
+  the second element is the final state.
   """
-  @spec run(any, state) :: {any, state}
-  def run(x, r), do: r.(x)
+  @spec run(any, state_m) :: {any, state}
+  def run(x, m), do: m.(x)
 
   @doc """
   Get the state.
@@ -53,7 +61,7 @@ defmodule Monad.State do
   def get(), do: fn st -> {st, st} end
 
   @doc """
-  Set the new state.
+  Set a new state.
 
   Returns `nil`.
   """
@@ -65,6 +73,6 @@ defmodule Monad.State do
 
   Returns `nil`.
   """
-  @spec modify(((state) -> state)) :: state_m
+  @spec modify((state -> state)) :: state_m
   def modify(f), do: fn st -> {nil, f.(st)} end
 end
