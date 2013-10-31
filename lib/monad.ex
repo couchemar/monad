@@ -4,6 +4,19 @@ defmodule Monad do
   @moduledoc """
   Behaviour that provides monadic do-notation and pipe-notation.
 
+  ## Terminology
+
+  The term "monad" is used here fairly loosely to refer to the whole concept of
+  monads. One way of looking at monads is as a kind of "programmable
+  semicolon". Monads define what happens between the evaluation of the
+  expressions. They control how and whether the results from one expression are
+  passed to the next. For a better explanation of what monads are, look
+  elsewhere, the internet is full of good (and not so good) monad tutorials;
+  e.g. have a look at the
+  [HaskellWiki](http://www.haskell.org/haskellwiki/Monads) or read ["Real World
+  Haskell"](http://book.realworldhaskell.org/) or ["Learn You a Haskell for
+  Great Good!"](http://learnyouahaskell.com/).
+
   ## Usage
 
   To use do-notation you need a module that implements Monad's callbacks,
@@ -29,16 +42,7 @@ defmodule Monad do
   is `{:just, f.(x / y)}`, else the computation fails and the return value is
   `:nothing`.
 
-  ## Terminology
-
-  The term "monad" is used here fairly loosely to refer to the whole concept of
-  monads. One way of looking at monads is as a kind of "programmable
-  semicolon". Monads define what happens between the evaluation of the
-  expressions. They control how and whether the results from one expression are
-  passed to the next. For a better explanation of what monads are, look
-  elsewhere, the internet is full of good (and not so good) monad tutorials.
-
-  ## Do-notation
+  ## Do-Notation
 
   The do-notation supported is pretty simple. Basically there are three rules to
   remember:
@@ -46,15 +50,29 @@ defmodule Monad do
   1. Every "statement" (i.e. thing on it's own line or separated by `;`) has to
      return a monadic value unless it's a "let statement".
 
-  2. To use the value "inside" a monadic value write "pattern <- action" where
-     "pattern" is a normal Elixir pattern and "action" is some expression which
-     returns a monadic value.
+  2. To use the value "inside" a monad write "pattern <- action" where "pattern"
+     is a normal Elixir pattern and "action" is some expression which returns a
+     monadic value.
 
   3. To use ordinary Elixir code inside a do-notation block prefix it with
      `let`. For multiple expressions or those for which precedence rules cause
      annoyances you can use `let` with a do block.
 
-  ## Monad laws
+  ## Defining Monads
+
+  To define your own monad create a module and use `use Monad`. This marks the
+  module as a monad behaviour. You'll need to define `return/1` and `bind/2`.
+
+  Here's an example which defines the `List` monad:
+
+      defmodule Monad.List do
+        use Monad
+
+        def return(x), do: [x]
+        def bind(x, f), do: Enum.flat_map(x, f)
+      end
+
+  ### Monad Laws
 
   `return/1` and `bind/2` need to obey a few rules (the so-called "monad laws")
   to avoid surprising the user. In the following equivalences `M` stands for
@@ -64,11 +82,14 @@ defmodule Monad do
   Equivalence means you can always substitute the left side for the right side
   and vice versa in an expression without changing the result or side-effects
 
-  * `M.bind(M.return(m), f)`    <=> `f.(m)` ("left identity")
-  * `M.bind(m, &M.return/1)`    <=> `m`     ("right identity")
-  * `M.bind(m, f) |> M.bind(g)` <=> `m |> M.bind(fn y -> M.bind(f.(y), g))` ("associativity")
+  * "left identity": `M.bind(M.return(m), f) <=> f.(m)`
+  * "right identity": `M.bind(m, &M.return/1) <=> m`
+  * "associativity": `M.bind(m, f) |> M.bind(g) <=> m |> M.bind(fn y -> M.bind(f.(y), g))`
 
-  ## Pipe support
+  See the [HaskellWiki](http://www.haskell.org/haskellwiki/Monad_laws) for more
+  explanation.
+
+  ## Pipe Support
 
   For monads that implement the `Monad.Pipeline` behaviour the `p` macro
   supports monadic pipelines. For example:
@@ -77,15 +98,15 @@ defmodule Monad do
                 |> Code.string_to_quoted(file: "/tmp/foo")
                 |> Macro.safe_term)
 
-  If any of the terms returns `{:error, x}` that's the return value of the
-  pipeline, if `{:ok, x}` is returned the `x` is passed to the next item.
+  If any of the terms returns `{:error, x}` then that's the return value of the
+  pipeline, when a term returns `{:ok, x}` the value `x` is passed to the next.
 
-  For a slightly nicer look this is also supported:
+  You can also use a `do`-block for less clutter:
 
       Error.p do
         File.read("/tmp/foo")
         |> Code.string_to_quoted(file: "/tmp/foo")
-        |> Macro.safe_term)
+        |> Macro.safe_term
       end
 
   Under the hood pipe binding works by calling the `pipebind` function in a
@@ -96,29 +117,10 @@ defmodule Monad do
   function. It has to return some AST that essentially does what bind does but
   with a function that's missing the first argument. See the example below.
 
-  ## Defining a monad
-
-  To define your own monad create a module and use `Monad.Behaviour`. This will
-  mark the module as containing a monad behaviour and create an overridable
-  default `pipebind` function (which calls `bind`). You'll need to define
-  `return` and `bind` yourself.
-
-  Here's an example that defines `return`, `bind` and `pipebind`:
-
-      defmodule Monad.List do
-        use Monad.Behaviour
-
-        def return(x), do: [x]
-        def bind(x, f), do: Enum.flat_map(x, f)
-        def pipebind(x, fc) do
-          quote Enum.flat_map(x,
-            &unquote(Macro.pipe(quote do &1 end, fc)))
-        end
-      end
   """
 
   @doc """
-  Helper for defining a monad.
+  Helper for defining monads.
 
   Just `use Monad` in your monad module and define `return/1` and
   `bind/2` to get the `m` macro.
@@ -225,7 +227,7 @@ end
 
 defmodule Monad.Pipeline do
   @moduledoc """
-  Helper for defining a monad that supports pipelines.
+  Helper for defining monads that supports pipelines.
 
   Just `use Monad.Behaviour` in your monad module and define `return/1` and
   `bind/2` and you get `pipebind/2` for free.
