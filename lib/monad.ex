@@ -226,7 +226,7 @@ end
 
 defmodule Monad.Pipeline do
   @moduledoc """
-  Helper for defining monads that supports pipelines.
+  Helper for defining monads that support pipelines.
 
   Just use `use Monad.Pipeline` in your monad module and define `return/1` and
   `bind/2` and get `pipebind/2` for free.
