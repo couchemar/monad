@@ -35,7 +35,7 @@ defmodule Monad.Maybe do
 
   ## Monad implementations
 
-  @spec bind(maybe_m, (any -> any)) :: maybe_m
+  @spec bind(maybe_m, (any -> maybe_m)) :: maybe_m
   def bind(m, f)
   def bind({:just, x}, f), do: f.(x)
   def bind(:nothing, _), do: :nothing
