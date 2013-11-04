@@ -27,7 +27,7 @@ To contribute:
 5. Push to your fork of the repository and then send a pull-request
    through GitHub.
 
-        git push mine some-topic-branch
+        git push mine feature/name-of-your-branch
 
 6. We will review your patch and merge it into the main repository or
    send you feedback.
