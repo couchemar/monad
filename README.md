@@ -1,5 +1,7 @@
 # Monad
 
+[![Build Status](https://travis-ci.org/rmies/monad.png?branch=develop)](https://travis-ci.org/rmies/monad)
+
 This library provides do-syntax and monads for
 [Elixir](http://elixir-lang.org/). It is heavily inspired by
 [Haskell](http://haskell.org/).
