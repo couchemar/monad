@@ -1,10 +1,10 @@
 defmodule Monad.ErrorTest do
   use ExUnit.Case, async: true
 
-  use Monad
-  import Monad.Error
+  require Monad.Error, as: Error
+  import Error
 
-  doctest Monad.Error
+  doctest Error
 
   test "Monad.Error error identity" do
     f = fn (x) -> x * x end
@@ -25,26 +25,26 @@ defmodule Monad.ErrorTest do
   end
 
   test "Monad.Error successful bind" do
-    assert (m Monad.Error do
-              x <- ok 2
+    assert (Error.m do
+              x <- {:ok, 2}
               return x * x
             end) == {:ok, 4}
   end
 
   test "Monad.Error failing bind" do
-    assert (m Monad.Error do
-              x <- error 2
+    assert (Error.m do
+              x <- {:error, 2}
               return x * x
             end) == {:error, 2}
   end
 
   test "Monad.Error pipeline" do
-    assert (pl Monad.Error, ({:ok, 2} |> (&{:ok, &1+2}).()))
+    assert Monad.Error.p({:ok, 2} |> (&{:ok, &1+2}).())
            == {:ok, 4}
   end
 
   test "Monad.Error pipeline fail" do
-    assert (pl Monad.Error, ({:error, 2} |> (&{:ok, &1+2}).()))
+    assert Monad.Error.p({:error, 2} |> (&{:ok, &1+2}).())
            == {:error, 2}
   end
 
@@ -53,19 +53,18 @@ defmodule Monad.ErrorTest do
   defp error_add_n(x, y), do: Monad.Error.return(x + y)
 
   test "Monad.Error pipeline multiple and call without parens" do
-    assert (pl Monad.Error,
-               ({:ok, 2} |> error_invert |> error_add_n(3)))
+    assert Monad.Error.p({:ok, 2} |> error_invert |> error_add_n(3))
            == {:ok, 1}
   end
 
   test "Monad.Error pipeline with do" do
-    assert (pl Monad.Error do
+    assert (Monad.Error.p do
               {:ok, 2} |> error_invert |> error_add_n(3)
             end) == {:ok, 1}
   end
 
   test "Monad.Error.fail" do
-    assert (m Monad.Error do
+    assert (Monad.Error.m do
               x <- fail "reason"
               return x * x
             end) == {:error, "reason"}

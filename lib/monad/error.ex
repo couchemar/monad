@@ -1,5 +1,6 @@
 defmodule Monad.Error do
-  use Monad.Behaviour
+  use Monad
+  use Monad.Pipeline
 
   @moduledoc """
   The Error monad.
@@ -12,9 +13,9 @@ defmodule Monad.Error do
 
   ## Examples
 
-      iex> use Monad
       iex> alias Monad.Error
-      iex> m Error do
+      iex> require Error
+      iex> Error.m do
       ...>   a <- {:ok, 1}
       ...>   b <- return 2
       ...>   return a + b
@@ -22,35 +23,40 @@ defmodule Monad.Error do
       {:ok, 3}
 
       iex> alias Monad.Error
-      iex> m Error do
-      ...>   a <- {:error, "aborted"}
+      iex> require Error
+      iex> Error.m do
+      ...>   a <- fail "aborted"
       ...>   b <- {:ok, 1}
       ...>   return a + b
       ...> end
       {:error, "aborted"}
   """
 
-  ## Monad implementations
+  @type error_m :: {:error, any} | {:ok, any}
 
+  ## Monad callback implementations
+
+  @spec bind(error_m, (any -> error_m)) :: error_m
+  @doc """
+  Bind the value inside Error monad `m` to function `f`.
+
+  Note that the computation shortcircuits if `m` is an `error` value.
+  """
+  def bind(m, f)
   def bind(e = {:error, _}, _), do: e
   def bind({:ok, x}, f), do: f.(x)
 
-  def return(x), do: ok(x)
+  @doc """
+  Inject `x` into a Error monad, i.e. returns {:ok, x}.
+  """
+  @spec return(any) :: error_m
+  def return(x), do: {:ok, x}
 
   ## Auxiliary functions
 
   @doc """
-  Alias for `error/1`.
+  Signal failure, i.e. returns `{:error, msg}`.
   """
-  def fail(r), do: error(r)
-
-  @doc """
-  Wraps a value in a `{:error, value}` tuple.
-  """
-  def error(x), do: {:error, x}
-
-  @doc """
-  Wraps a value in a `{:ok, value}` tuple.
-  """
-  def ok(x), do: {:ok, x}
+  @spec fail(any) :: error_m
+  def fail(msg), do: {:error, msg}
 end
